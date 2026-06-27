@@ -476,7 +476,7 @@ function render(R,pct,dist){
     return d.toDateString()===now.toDateString()?t:d.toLocaleDateString([],{weekday:'short'})+" "+t;};
   // favourability of each still-live group's current scoreline to Iran (only while Iran's fate is undecided)
   const favMap={}; if(!decided) for(const G of (R.PG||[])) favMap[G.gp]=groupFav(G,R.ip,R.igd,R.igf);
-  const FAVI={good:"▲ good for Iran",bad:"▼ bad for Iran",neu:"● neutral"},
+  const FAVI={good:"▲ good for 🇮🇷",bad:"▼ bad for 🇮🇷",neu:"● neutral"},
         FAVT={good:"As it stands, this group's 3rd-placed team would finish BELOW Iran — good for Iran's chances.",
               bad:"As it stands, this group's 3rd-placed team would finish ABOVE Iran — hurts Iran's chances.",
               neu:"As it stands, this group's 3rd-placed team is level with Iran — too close to call."};
@@ -491,8 +491,8 @@ function render(R,pct,dist){
     const favChip=fav?`<span class="favind ${fav}" title="${FAVT[fav]}">${FAVI[fav]}</span>`:"";
     return `<div class="match"${dec?' title="affects Iran"':''}>
       <span class="g">${dec?"🇮🇷 ":""}${esc(tag)}</span>
-      <span class="tm">${flag(m.home)}${A(m.hlink,esc(m.home))} <span style="color:var(--muted)">v</span> ${flag(m.away)}${A(m.alink,esc(m.away))}${favChip}</span>
-      <span class="sc">${sc}</span><span class="st ${cl}" style="width:auto;text-align:right">${status}</span></div>`;}).join("")
+      <span class="tm">${flag(m.home)}${A(m.hlink,esc(m.home))} <span style="color:var(--muted)">v</span> ${flag(m.away)}${A(m.alink,esc(m.away))}</span>
+      <span class="sc">${sc}</span>${favChip}<span class="st ${cl}" style="width:auto;text-align:right">${status}</span></div>`;}).join("")
     || `<div class="err">No matches in the current window — the tournament may be between rounds.</div>`;
   iranState = R.clinched?"in" : R.eliminated?"out" : (R.allFinal?(pct>=50?"in":"out"):"live"); renderNext();
   if(iranState==="in" && !celebrated){ celebrated=true; try{ celebrate(); }catch(e){} }   // 🎉 Iran advance!
