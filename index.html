@@ -95,6 +95,17 @@
   .bx .meta{font-size:9px;color:var(--muted);margin-top:1px;text-align:right}
   .bx .meta a{color:inherit} .bx .meta .liv{color:var(--amber);font-weight:600}
   .bx a{color:inherit} .bx a:hover{text-decoration:underline}
+  /* draggable section blocks */
+  .reset{color:var(--accent);cursor:pointer;font-size:12.5px}
+  #blocks{margin-top:14px}
+  .block{position:relative;margin-top:22px}
+  #blocks>.block:first-child{margin-top:4px}
+  .block>h2{margin-top:0}
+  .block>.grip{position:absolute;top:0;right:2px;z-index:6;cursor:grab;color:var(--muted);opacity:.3;
+    font-size:15px;line-height:1;padding:4px 7px;border-radius:7px;user-select:none}
+  .block>.grip:hover{opacity:.95;background:var(--surface2)}
+  .block>.grip:active{cursor:grabbing}
+  .block.dragging{opacity:.4}
   footer{margin-top:32px;color:var(--muted);font-size:11.5px;line-height:1.7;text-align:center}
   .err{color:var(--amber);font-size:13px}
   @media (max-width:560px){
@@ -115,26 +126,41 @@
   <h1 id="h1"><span class="flag">🇮🇷</span> Iran — Round-of-32 Watch</h1>
   <p class="sub">Live probability Iran advances as one of the <b>8 best third-placed teams</b> — computed in real time from the live group tables.</p>
   <div class="live stale" id="live"><span class="dot"></span><span id="liveTxt">connecting to live feed…</span>
-    <button class="btn" style="margin-left:6px;padding:3px 9px" onclick="refresh(true)">↻</button></div>
+    <button class="btn" style="margin-left:6px;padding:3px 9px" onclick="refresh(true)">↻</button>
+    <a class="reset" onclick="resetBlocks()" title="Restore the default section order">⤺ reset layout</a></div>
 
-  <div class="card">
-    <div class="gaugewrap"><div class="gcol"><div class="gauge" id="gauge"></div><div class="gcap" id="gcap"></div></div><div class="verdict" id="verdict"></div></div>
+  <div id="blocks">
+    <section class="block" data-block="gauge"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
+      <div class="card">
+        <div class="gaugewrap"><div class="gcol"><div class="gauge" id="gauge"></div><div class="gcap" id="gcap"></div></div><div class="verdict" id="verdict"></div></div>
+      </div>
+    </section>
+
+    <section class="block" data-block="table"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
+      <h2>Best third-placed teams — live table (top 8 advance)</h2>
+      <div class="card" id="tableCard"><div class="err" id="tableMsg">loading…</div></div>
+    </section>
+
+    <section class="block" data-block="matches"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
+      <h2><span id="decLabel">Group deciders</span> <span id="decHdr" style="text-transform:none;letter-spacing:0;color:var(--muted)"></span></h2>
+      <div class="card" id="matchCard"></div>
+    </section>
+
+    <section class="block" data-block="next"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
+      <h2>Next up · Round of 32</h2>
+      <div class="card" id="nextCard"><div class="err">loading bracket…</div></div>
+    </section>
+
+    <section class="block" data-block="bracket"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
+      <h2>Knockout bracket</h2>
+      <div class="card" id="bracketCard"><div class="err">loading bracket…</div></div>
+    </section>
+
+    <section class="block" data-block="dist"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
+      <h2>How many third-place teams finish above Iran?</h2>
+      <div class="card"><div class="dist" id="dist"></div><div class="legend" id="distLegend"></div></div>
+    </section>
   </div>
-
-  <h2>Best third-placed teams — live table (top 8 advance)</h2>
-  <div class="card" id="tableCard"><div class="err" id="tableMsg">loading…</div></div>
-
-  <h2><span id="decLabel">Group deciders</span> <span id="decHdr" style="text-transform:none;letter-spacing:0;color:var(--muted)"></span></h2>
-  <div class="card" id="matchCard"></div>
-
-  <h2>Next up · Round of 32</h2>
-  <div class="card" id="nextCard"><div class="err">loading bracket…</div></div>
-
-  <h2>Knockout bracket</h2>
-  <div class="card" id="bracketCard"><div class="err">loading bracket…</div></div>
-
-  <h2>How many third-place teams finish above Iran?</h2>
-  <div class="card"><div class="dist" id="dist"></div><div class="legend" id="distLegend"></div></div>
 
   <footer id="foot"></footer>
 </div>
@@ -524,6 +550,26 @@ let wakeLock=null;
 async function keepAwake(){try{if("wakeLock" in navigator && !document.hidden) wakeLock=await navigator.wakeLock.request("screen");}catch(e){}}
 keepAwake();
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){keepAwake();refresh();fetchNext();}});
+
+/* ── drag-to-reorder the page sections (persisted per browser) ── */
+function saveBlocks(){try{localStorage.setItem("iranBlocks",JSON.stringify([...$("#blocks").querySelectorAll(".block")].map(b=>b.dataset.block)));}catch(e){}}
+function applyBlocks(){let o;try{o=JSON.parse(localStorage.getItem("iranBlocks")||"[]");}catch(e){return;}if(!o.length)return;
+  const c=$("#blocks"),pos=new Map(o.map((k,i)=>[k,i]));
+  [...c.querySelectorAll(".block")].sort((a,b)=>(pos.has(a.dataset.block)?pos.get(a.dataset.block):1e6)-(pos.has(b.dataset.block)?pos.get(b.dataset.block):1e6)).forEach(b=>c.appendChild(b));}
+function resetBlocks(){localStorage.removeItem("iranBlocks");location.reload();}
+function blockAfter(c,y){let best=null,bestOff=-Infinity;
+  for(const el of c.querySelectorAll(".block:not(.dragging)")){const b=el.getBoundingClientRect(),off=y-(b.top+b.height/2);
+    if(off<0&&off>bestOff){bestOff=off;best=el;}}return best;}
+(function enableBlockDnD(){const c=$("#blocks");if(!c)return;let dragEl=null;
+  c.addEventListener("dragstart",e=>{const g=e.target.closest(".grip");if(!g)return;dragEl=g.closest(".block");
+    dragEl.classList.add("dragging");e.dataTransfer.effectAllowed="move";
+    try{e.dataTransfer.setData("text/plain",dragEl.dataset.block);e.dataTransfer.setDragImage(dragEl,30,20);}catch(_){}});
+  c.addEventListener("dragover",e=>{if(!dragEl)return;e.preventDefault();const after=blockAfter(c,e.clientY);
+    if(after==null)c.appendChild(dragEl);else if(after!==dragEl)c.insertBefore(dragEl,after);});
+  c.addEventListener("drop",e=>e.preventDefault());
+  c.addEventListener("dragend",()=>{if(!dragEl)return;dragEl.classList.remove("dragging");dragEl=null;saveBlocks();});
+})();
+applyBlocks();
 </script>
 </body>
 </html>
