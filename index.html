@@ -6,7 +6,7 @@
 <title>Iran · Round-of-32 Watch</title>
 <style>
   :root{--bg:#0f1115;--surface:#171a21;--surface2:#1e222b;--line:#272c36;--ink:#e9ecf1;--muted:#9aa3af;--accent:#6ea8fe;
-        --green:#3ad29f;--red:#f4736b;--amber:#f5c451;--iran-g:#3ad29f;--iran-r:#f4736b;}
+        --green:#3ad29f;--red:#f4736b;--amber:#f5c451;}
   @media (prefers-color-scheme: light){
     :root{--bg:#f6f7f9;--surface:#ffffff;--surface2:#f0f2f5;--line:#e3e6ea;--ink:#1a1d21;--muted:#5f6772;--accent:#185FA5;
           --green:#13855f;--red:#c5413a;--amber:#b6831a;}
@@ -15,246 +15,280 @@
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5}
   a{color:var(--accent);text-decoration:none}
-  .wrap{max-width:920px;margin:0 auto;padding:34px 18px 80px}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 16px 80px}
   .crumb{font-size:13px;color:var(--muted);margin-bottom:10px}
-  h1{font-size:27px;margin:0 0 4px;font-weight:800;letter-spacing:-.5px}
+  h1{font-size:26px;margin:0 0 4px;font-weight:800;letter-spacing:-.5px}
   h1 .flag{font-weight:400}
-  .sub{color:var(--muted);margin:0;font-size:14.5px}
-  .asof{font-size:12px;color:var(--muted);margin-top:8px;background:var(--surface2);border:1px solid var(--line);
-        border-radius:10px;padding:8px 11px;display:inline-block}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:18px}
-  .gaugewrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .sub{color:var(--muted);margin:0;font-size:14px}
+  .live{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-top:10px;
+        background:var(--surface2);border:1px solid var(--line);border-radius:20px;padding:5px 12px}
+  .live .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green)}
+  .live.stale .dot{background:var(--amber);box-shadow:0 0 7px var(--amber)}
+  .live .dot.pulse{animation:pl 1.6s ease-in-out infinite}
+  @keyframes pl{0%,100%{opacity:1}50%{opacity:.35}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:16px}
+  .gaugewrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center}
   .gauge{position:relative;flex:none}
   .gauge .pct{position:absolute;left:0;right:0;top:54%;transform:translateY(-50%);text-align:center}
-  .gauge .pct .n{font-size:52px;font-weight:850;letter-spacing:-2px;line-height:1}
-  .gauge .pct .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
-  .verdict{flex:1;min-width:240px}
-  .verdict h3{margin:0 0 6px;font-size:17px}
-  .verdict p{margin:0 0 8px;color:var(--muted);font-size:14px}
-  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .pill{font-size:12.5px;border:1px solid var(--line);background:var(--surface2);border-radius:20px;padding:3px 11px}
+  .gauge .pct .n{font-size:50px;font-weight:850;letter-spacing:-2px;line-height:1}
+  .gauge .pct .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+  .verdict{flex:1;min-width:230px}
+  .verdict h3{margin:0 0 6px;font-size:18px}
+  .verdict p{margin:0;color:var(--muted);font-size:14px}
+  .pills{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+  .pill{font-size:12px;border:1px solid var(--line);background:var(--surface2);border-radius:20px;padding:3px 10px}
   .pill b{font-weight:700}
-  h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:26px 0 12px;font-weight:600}
-  .row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
-  .row:last-child{border-bottom:0}
-  .row .nm{font-size:14.5px;font-weight:600}
-  .row .nt{font-size:12.5px;color:var(--muted)}
-  .x{cursor:pointer;color:var(--muted);border:1px solid var(--line);border-radius:7px;width:26px;height:26px;
-     display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--surface2);flex:none}
-  .x:hover{color:var(--red);border-color:var(--red)}
-  .threat{border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin-bottom:11px;background:var(--surface2)}
-  .threat .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-  .threat .ti{font-size:15px;font-weight:650}
-  .threat .tm{font-size:12.5px;color:var(--muted);margin-top:1px}
-  .threat .qv{font-size:15px;font-weight:700;min-width:46px;text-align:right}
-  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:11px}
-  .seg button{border:0;background:var(--surface);color:var(--muted);padding:6px 12px;font-size:12.5px;cursor:pointer}
-  .seg button.on{color:#fff}
-  .seg button.on.above{background:var(--red)} .seg button.on.below{background:var(--green)} .seg button.on.live{background:var(--accent)}
-  input[type=range]{width:100%;margin:12px 0 2px;accent-color:var(--accent)}
-  .rnote{font-size:11.5px;color:var(--muted);margin-top:4px}
-  .dist{display:flex;gap:6px;align-items:flex-end;height:110px;margin-top:10px}
-  .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%}
-  .bar .b{width:100%;border-radius:6px 6px 0 0;min-height:2px;transition:height .4s ease,background .2s}
-  .bar .bl{font-size:11px;color:var(--muted);text-align:center;line-height:1.2}
-  .bar .bp{font-size:11.5px;font-weight:600}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:26px 0 11px;font-weight:600}
+  #tableCard{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:8px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:nth-child(2),td:nth-child(2){text-align:left;width:99%}
+  thead th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+  tr.iran td{background:rgba(110,168,254,.10);font-weight:700}
+  tr.cut td{border-bottom:2px dashed var(--amber)}
+  .tag{font-size:10.5px;border-radius:5px;padding:1px 6px;border:1px solid var(--line);color:var(--muted)}
+  .tag.live{color:var(--amber);border-color:var(--amber)}
+  .tag.in{color:var(--green);border-color:var(--green)}
+  .tag.out{color:var(--red);border-color:var(--red)}
+  .match{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line)}
+  .match:last-child{border-bottom:0}
+  .match .g{font-size:11px;color:var(--muted);width:64px;flex:none}
+  .match .tm{flex:1;font-size:13.5px}
+  .match .sc{font-weight:750;font-size:15px;min-width:46px;text-align:center}
+  .match .st{font-size:11px;width:78px;text-align:right;flex:none}
+  .st.fin{color:var(--muted)} .st.liv{color:var(--amber);font-weight:600} .st.pre{color:var(--muted)}
+  .dist{display:flex;gap:7px;align-items:flex-end;height:96px;margin-top:8px}
+  .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;justify-content:flex-end;height:100%}
+  .bar .b{width:100%;border-radius:6px 6px 0 0;min-height:2px;transition:height .5s ease}
+  .bar .bl{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.2}
+  .bar .bp{font-size:11px;font-weight:600}
   .legend{font-size:12px;color:var(--muted);margin-top:8px}
-  .ctrls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  .btn{border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:9px;padding:7px 13px;
-       font-size:13px;cursor:pointer}
+  footer{margin-top:32px;color:var(--muted);font-size:11.5px;line-height:1.7;text-align:center}
+  .err{color:var(--amber);font-size:13px}
+  @media (max-width:560px){
+    .wrap{padding:22px 12px 70px}
+    h1{font-size:21px}
+    .gauge .pct .n{font-size:44px}
+    th,td{padding:7px 5px}
+    .match .g{width:46px} .match .st{width:58px} .match .sc{min-width:38px}
+  }
+  .btn{border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:9px;padding:6px 12px;
+       font-size:12.5px;cursor:pointer}
   .btn:hover{border-color:var(--accent);color:var(--accent)}
-  .addrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-  .addrow input{flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--line);border-radius:9px;
-                padding:7px 10px;color:var(--ink);font-size:13px}
-  footer{margin-top:34px;color:var(--muted);font-size:11.5px;line-height:1.7;text-align:center}
-  .barwrap{position:relative}
-  .cut{position:absolute;top:0;bottom:24px;border-left:2px dashed var(--amber);pointer-events:none}
-  .cut span{position:absolute;top:-18px;left:4px;font-size:10.5px;color:var(--amber);white-space:nowrap}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="crumb"><a href="https://hlash99.github.io/">← hlash99 dashboard</a></div>
   <h1><span class="flag">🇮🇷</span> Iran — Round-of-32 Watch</h1>
-  <p class="sub">Live probability that Iran advances as one of the <b>8 best third-placed teams</b>, updated as tomorrow's deciders play out.</p>
-  <div class="asof" id="asof"></div>
+  <p class="sub">Live probability Iran advances as one of the <b>8 best third-placed teams</b> — computed in real time from the live group tables.</p>
+  <div class="live stale" id="live"><span class="dot"></span><span id="liveTxt">connecting to live feed…</span>
+    <button class="btn" style="margin-left:6px;padding:3px 9px" onclick="refresh(true)">↻</button></div>
 
   <div class="card">
-    <div class="gaugewrap">
-      <div class="gauge" id="gauge"></div>
-      <div class="verdict" id="verdict"></div>
-    </div>
+    <div class="gaugewrap"><div class="gauge" id="gauge"></div><div class="verdict" id="verdict"></div></div>
   </div>
 
-  <h2>Iran's group is done — now it's the third-place race</h2>
-  <div class="card" id="iranCard"></div>
+  <h2>Best third-placed teams — live table (top 8 advance)</h2>
+  <div class="card" id="tableCard"><div class="err" id="tableMsg">loading…</div></div>
 
-  <h2>Locked in above Iran</h2>
-  <div class="card" id="lockedCard"></div>
-
-  <h2>Tomorrow's deciders — each could push Iran down</h2>
-  <div class="card">
-    <div id="threats"></div>
-    <div class="addrow">
-      <input id="naddL" placeholder="group / team">
-      <input id="naddM" placeholder="match (optional)">
-      <button class="btn" onclick="addThreat()">+ add threat</button>
-    </div>
-    <div class="ctrls"><button class="btn" onclick="resetAll()">↺ reset to baseline</button></div>
-  </div>
+  <h2>Tomorrow's deciders <span id="decHdr" style="text-transform:none;letter-spacing:0;color:var(--muted)"></span></h2>
+  <div class="card" id="matchCard"></div>
 
   <h2>How many third-place teams finish above Iran?</h2>
-  <div class="card">
-    <div class="barwrap"><div class="dist" id="dist"></div><div class="cut" id="cut"><span id="cutlbl"></span></div></div>
-    <div class="legend" id="distLegend"></div>
-  </div>
+  <div class="card"><div class="dist" id="dist"></div><div class="legend" id="distLegend"></div></div>
 
   <footer id="foot"></footer>
 </div>
 
 <script>
-/* ── Seed state (public group-stage data as of June 26, 2026; all editable) ── */
-const SEED={
-  updated:"2026-06-26",
-  asof:"Seeded from public group-stage standings, June 26 2026. Iran (Group G) is locked on 3 pts / 0 GD / 3 GF. Adjust the sliders or set results live as the June 27 matches play.",
-  iran:{pts:3,gd:0,gf:3,record:["2–2 New Zealand","0–0 Belgium","1–1 Egypt"]},
-  slots:8,                         // best 8 of 12 third-placed teams advance
-  lockedAbove:[
-    {team:"Sweden",note:"4 pts"},
-    {team:"Ecuador",note:"4 pts"},
-    {team:"Bosnia & Herzegovina",note:"4 pts · −1"},
-    {team:"Paraguay",note:"4 pts · −2"},
-    {team:"Senegal",note:"3 pts · +2 GD"},
-  ],
-  lockedBelow:[
-    {team:"South Korea",note:"3 pts · −1 GD — below Iran"},
-  ],
-  // each pending group yields a 3rd-place team; q = est. probability it outranks Iran's 3/0/3
-  threats:[
-    {id:"cro",label:"Croatia's group",match:"Croatia v Ghana",q:0.50,res:null},
-    {id:"arg",label:"Argentina's group",match:"Jordan v Argentina · Algeria v Austria",q:0.45,res:null},
-    {id:"por",label:"Portugal's group",match:"Colombia v Portugal · DR Congo v Uzbekistan",q:0.50,res:null},
-    {id:"eng",label:"England's group",match:"Panama v England (+ pair match)",q:0.40,res:null},
-  ],
-};
-const LS="iranR32";
-let S=load();
-function load(){try{const v=JSON.parse(localStorage.getItem(LS));if(v&&v.threats)return v;}catch(e){}
-  return JSON.parse(JSON.stringify(SEED));}
-function save(){localStorage.setItem(LS,JSON.stringify(S));}
-
 const $=s=>document.querySelector(s);
-const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-const qOf=t=>t.res==="above"?1:t.res==="below"?0:t.q;
+const STAND="https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings?season=2026";
+const SCORE=d=>`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=${d}`;
+const IRAN="Iran", SLOTS=8, SIMS=30000;
+const dates=["20260626","20260627","20260628"];   // window covering final group matches
+let timer=null;
 
-/* tolerance: how many more thirds can finish above Iran and Iran still makes top-8 */
-function tolerance(){return S.slots-1-S.lockedAbove.length;}
-
-/* Poisson-binomial: P(k of the threats finish above Iran) */
-function distribution(){
-  let p=[1];
-  for(const t of S.threats){const q=qOf(t);const np=new Array(p.length+1).fill(0);
-    for(let k=0;k<p.length;k++){np[k]+=p[k]*(1-q);np[k+1]+=p[k]*q;}p=np;}
-  return p;                     // p[k] = prob exactly k above
+/* ── ESPN parsing ── */
+function parseStandings(j){
+  const groups=[];
+  (function walk(n){ if(!n)return;
+    if(n.standings&&n.standings.entries){
+      const teams=n.standings.entries.map(e=>{const s={};(e.stats||[]).forEach(x=>s[x.name]=x.value);
+        return {team:e.team.displayName,P:s.gamesPlayed|0,pts:s.points|0,gd:s.pointDifferential|0,gf:s.pointsFor|0};});
+      groups.push({group:n.name,teams});
+    }
+    (n.children||[]).forEach(walk);(n.groups||[]).forEach(walk);
+  })(j);
+  return groups;
 }
-function advanceProb(){
-  const tol=tolerance(); if(tol<0)return 0; const p=distribution();
-  let s=0;for(let k=0;k<=Math.min(tol,p.length-1);k++)s+=p[k];return s;
+function parseScore(j){
+  return (j.events||[]).map(e=>{const c=e.competitions[0],st=e.status;
+    const cs=c.competitors;
+    const home=cs.find(x=>x.homeAway==="home")||cs[0], away=cs.find(x=>x.homeAway==="away")||cs[1];
+    return {home:home.team.displayName,away:away.team.displayName,
+      hs:+home.score||0,as:+away.score||0,
+      state:st.type.state, detail:st.type.shortDetail||st.type.detail,
+      min:st.type.state==="in"?(st.period>=2?45+(parseInt(st.displayClock)||0):(parseInt(st.displayClock)||0)):(st.type.state==="post"?90:0)};
+  });
 }
 
-/* ── gauge (semicircle) ── */
-function gauge(pct){
-  const w=220,h=140,cx=110,cy=120,r=92,sw=18;
-  const a0=Math.PI, a1=Math.PI*(1-pct/100);
-  const pt=a=>[cx+r*Math.cos(a),cy-r*Math.sin(a)];
-  const [sx,sy]=pt(a0),[ex,ey]=pt(0),[fx,fy]=pt(a1);
-  const big=pct>50?1:0;
-  const col=pct>=66?"var(--green)":pct>=40?"var(--amber)":"var(--red)";
+/* ── group helpers ── */
+function rankTeams(ts){return ts.slice().sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);}
+function thirdOf(g){return rankTeams(g.teams)[2];}
+function aboveIran(t,ir){return (t.pts>ir.pts)||(t.pts===ir.pts&&t.gd>ir.gd)||(t.pts===ir.pts&&t.gd===ir.gd&&t.gf>ir.gf);}
+
+/* ── poisson + match sim ── */
+function pois(l){let L=Math.exp(-l),k=0,p=1;do{k++;p*=Math.random();}while(p>L);return k-1;}
+function simMatch(m,strength){
+  if(m.state==="post") return {hs:m.hs,as:m.as};
+  const left=Math.max(0,(90-m.min))/90;
+  const sh=strength[m.home]||1, sa=strength[m.away]||1;
+  const lh=1.35*left*Math.min(1.8,Math.max(.55,Math.exp(0.18*(sh-sa)))),
+        la=1.35*left*Math.min(1.8,Math.max(.55,Math.exp(0.18*(sa-sh))));
+  return {hs:m.hs+pois(lh), as:m.as+pois(la)};
+}
+function applyResult(group,m,res){
+  const h=group.teams.find(t=>t.team===m.home), a=group.teams.find(t=>t.team===m.away);
+  if(!h||!a) return;
+  h.gf+=res.hs; h.gd+=res.hs-res.as; a.gf+=res.as; a.gd+=res.as-res.hs;
+  if(res.hs>res.as)h.pts+=3; else if(res.hs<res.as)a.pts+=3; else {h.pts++;a.pts++;}
+}
+
+/* ── core compute ── */
+function compute(groups, matches){
+  const iran=groups.flatMap(g=>g.teams).find(t=>t.team===IRAN);
+  if(!iran) throw new Error("Iran not found in feed");
+  // map each non-final match to its group
+  const teamGroup={}; groups.forEach(g=>g.teams.forEach(t=>teamGroup[t.team]=g.group));
+  const pendGroups=new Set(groups.filter(g=>g.teams.some(t=>t.P<3)).map(g=>g.group));
+  const liveMatches=matches.filter(m=>teamGroup[m.home]&&pendGroups.has(teamGroup[m.home])&&m.state!=="post");
+  const matchByGroup={}; matches.forEach(m=>{const gp=teamGroup[m.home]; if(gp){(matchByGroup[gp]=matchByGroup[gp]||[]).push(m);} });
+
+  // strength proxy from current form (pts/game + 0.3*gd/game)
+  const strength={}; groups.forEach(g=>g.teams.forEach(t=>{const p=Math.max(1,t.P); strength[t.team]=t.pts/p+0.3*t.gd/p;}));
+
+  // current third-place table
+  const thirds=groups.map(g=>({group:g.group, t:thirdOf(g), done:g.teams.every(x=>x.P>=3)}));
+  const ranked=thirds.slice().sort((a,b)=>b.t.pts-a.t.pts||b.t.gd-a.t.gd||b.t.gf-a.t.gf);
+  const iranPos=ranked.findIndex(r=>r.t.team===IRAN)+1;
+  const pending=thirds.filter(r=>!r.done).map(r=>r.group);
+
+  // Monte-Carlo final outcomes
+  const distAbove=new Array(13).fill(0);   // # thirds finishing above Iran (across all groups)
+  let advance=0;
+  const baseAbove= thirds.filter(r=>r.done && r.t.team!==IRAN && aboveIran(r.t,iran)).length;
+  for(let s=0;s<SIMS;s++){
+    // clone only pending groups
+    let above=baseAbove;
+    for(const gp of pending){
+      const g={group:gp,teams:groups.find(x=>x.group===gp).teams.map(t=>({...t}))};
+      for(const m of (matchByGroup[gp]||[])) if(m.state!=="post") applyResult(g,m,simMatch(m,strength));
+      const th=thirdOf(g);
+      if(aboveIran(th,iran)) above++;
+    }
+    distAbove[above]++;
+    if(above < SLOTS) advance++;   // Iran (one of the thirds) is in top-8 iff <8 finish above it
+  }
+  const pct=advance/SIMS*100;
+  return {iran,iranPos,ranked,pending,liveMatches,matchByGroup,teamGroup,
+          dist:distAbove.map(c=>c/SIMS), baseAbove, pct,
+          allFinal:pending.length===0};
+}
+
+/* ── gauge ── */
+function gauge(pct,clinch){
+  const w=210,h=132,cx=105,cy=114,r=88,sw=17;
+  const a1=Math.PI*(1-pct/100), pt=a=>[cx+r*Math.cos(a),cy-r*Math.sin(a)];
+  const [sx,sy]=pt(Math.PI),[ex,ey]=pt(0),[fx,fy]=pt(a1),big=pct>50?1:0;
+  const col=pct>=66?"var(--green)":pct>=38?"var(--amber)":"var(--red)";
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
     <path d="M${sx} ${sy} A${r} ${r} 0 0 1 ${ex} ${ey}" fill="none" stroke="var(--line)" stroke-width="${sw}" stroke-linecap="round"/>
     <path d="M${sx} ${sy} A${r} ${r} 0 ${big} 1 ${fx} ${fy}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round"/>
-  </svg>
-  <div class="pct"><div class="n" style="color:${col}">${Math.round(pct)}%</div><div class="l">chance to advance</div></div>`;
+  </svg><div class="pct"><div class="n" style="color:${col}">${pct>=99.5?100:pct<=0.5?0:Math.round(pct)}%</div>
+    <div class="l">${clinch||"chance to advance"}</div></div>`;
 }
 
-function render(){
-  $("#asof").textContent=S.asof;
-  const pct=advanceProb()*100, tol=tolerance(), n=S.threats.length;
-  const liveAbove=S.threats.filter(t=>t.res==="above").length;
-  const liveBelow=S.threats.filter(t=>t.res==="below").length;
+/* ── render ── */
+function render(R,stamp,live){
+  const ir=R.iran, pct=R.pct;
+  const clinch=R.allFinal?(pct>=50?"QUALIFIED ✓":"ELIMINATED"):null;
+  $("#gauge").innerHTML=gauge(pct,clinch);
+  const st=R.allFinal?(pct>=50?["Through to the Round of 32","var(--green)"]:["Eliminated","var(--red)"])
+        :pct>=66?["In control","var(--green)"]:pct>=38?["On the bubble","var(--amber)"]:["Sweating it","var(--red)"];
+  $("#verdict").innerHTML=`<h3 style="color:${st[1]}">${st[0]}</h3>
+    <p>Iran finished Group G 3rd on <b>${ir.pts} pts · ${ir.gd>=0?"+":""}${ir.gd} GD · ${ir.gf} GF</b>, currently
+    <b>${R.iranPos}${["","st","nd","rd"][R.iranPos]||"th"}</b> of the 12 third-placed teams. ${R.allFinal?
+      "All groups are final.":`Iran is eliminated only if <b>all ${R.pending.length}</b> still-live group${R.pending.length>1?"s":""}
+      (${R.pending.join(", ")}) produce a third-place team better than Iran's record.`}</p>
+    <div class="pills"><span class="pill"><b>${SLOTS}</b> thirds advance</span>
+      <span class="pill"><b>${R.baseAbove}</b> locked above</span>
+      <span class="pill"><b>${R.pending.length}</b> group${R.pending.length!==1?"s":""} live</span></div>`;
 
-  $("#gauge").innerHTML=gauge(pct);
-  const status=pct>=66?["In control","var(--green)"]:pct>=40?["On the bubble","var(--amber)"]:["Sweating it","var(--red)"];
-  $("#verdict").innerHTML=`<h3 style="color:${status[1]}">${status[0]}</h3>
-    <p>Iran is provisionally <b>6th</b> of the third-placed teams. ${S.lockedAbove.length} are already locked above them,
-    so Iran grabs one of the last open spots unless <b>more than ${tol}</b> of tomorrow's groups produce a third-place team better than
-    <b>3 pts · 0 GD · 3 GF</b>.</p>
-    <div class="pills">
-      <span class="pill"><b>${S.slots}</b> thirds advance</span>
-      <span class="pill"><b>${S.lockedAbove.length}</b> locked above</span>
-      <span class="pill">tolerance <b>${tol}</b> of <b>${n}</b></span>
-      ${liveAbove?`<span class="pill" style="border-color:var(--red)"><b>${liveAbove}</b> above (final)</span>`:""}
-      ${liveBelow?`<span class="pill" style="border-color:var(--green)"><b>${liveBelow}</b> below (final)</span>`:""}
-    </div>`;
+  // third-place table (top 10)
+  const rows=R.ranked.slice(0,10).map((r,i)=>{
+    const isIran=r.t.team===IRAN, pos=i+1;
+    const tag=r.done?`<span class="tag">final</span>`:`<span class="tag live">live</span>`;
+    return `<tr class="${isIran?"iran":""} ${pos===SLOTS?"cut":""}">
+      <td>${pos}</td><td>${isIran?"🇮🇷 ":""}${r.t.team} <span style="color:var(--muted);font-size:11px">${r.group.replace("Group ","Grp ")}</span></td>
+      <td>${r.t.pts}</td><td>${r.t.gd>=0?"+":""}${r.t.gd}</td><td>${r.t.gf}</td><td>${tag}</td></tr>`;}).join("");
+  $("#tableCard").innerHTML=`<table><thead><tr><th>#</th><th>Team</th><th>Pts</th><th>GD</th><th>GF</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="legend" style="margin-top:8px">Dashed line = top-8 cutoff. Ranked by points → goal difference → goals for (FIFA tiebreakers).</div>`;
 
-  const ir=S.iran;
-  $("#iranCard").innerHTML=`<div class="row"><div><div class="nm">🇮🇷 Iran — Group G, 3rd place</div>
-    <div class="nt">${ir.record.join("  ·  ")}</div></div>
-    <div style="text-align:right"><div class="nm">${ir.pts} pts</div><div class="nt">${ir.gd>=0?"+":""}${ir.gd} GD · ${ir.gf} GF</div></div></div>`;
+  // matches
+  const ms=R.liveMatches.length?R.liveMatches:Object.values(R.matchByGroup).flat().filter(m=>R.pending.includes(R.teamGroup[m.home]));
+  $("#decHdr").textContent=R.allFinal?"— all final":"";
+  $("#matchCard").innerHTML=(ms.length?ms:Object.values(R.matchByGroup).flat()).slice(0,8).map(m=>{
+    const cl=m.state==="post"?"fin":m.state==="in"?"liv":"pre";
+    const sc=m.state==="pre"?"–":`${m.hs}–${m.as}`;
+    return `<div class="match"><span class="g">${(R.teamGroup[m.home]||"").replace("Group ","Grp ")}</span>
+      <span class="tm">${m.home} v ${m.away}</span><span class="sc">${sc}</span>
+      <span class="st ${cl}">${m.state==="in"?m.detail:m.state==="post"?"FT":m.detail.replace(/^.*at /,"")}</span></div>`;}).join("")
+    || `<div class="err">No live group deciders affecting Iran right now.</div>`;
 
-  $("#lockedCard").innerHTML=S.lockedAbove.map((t,i)=>
-    `<div class="row"><div><div class="nm">${t.team}</div><div class="nt">${t.note}</div></div>
-      <div class="x" onclick="rmLocked(${i})" title="they slipped below Iran">✕</div></div>`).join("")
-    + (S.lockedBelow.length?`<div class="nt" style="margin-top:10px">Below Iran: ${S.lockedBelow.map(t=>t.team+" ("+t.note.replace(' — below Iran','')+")").join(", ")}</div>`:"");
+  // distribution of # thirds above Iran (Iran in if < 8)
+  const d=R.dist; const maxk=Math.max(2, d.reduce((m,v,i)=>v>0.001?i:m,0));
+  const showFrom=Math.max(0,R.baseAbove-0);
+  let bars="";
+  for(let k=showFrom;k<=Math.min(maxk+1,12);k++){
+    const adv=k<SLOTS, v=d[k]||0;
+    bars+=`<div class="bar"><div class="bp" style="color:${adv?'var(--green)':'var(--red)'}">${v>=0.005?Math.round(v*100)+"%":""}</div>
+      <div class="b" style="height:${Math.max(2,v* (96-18)/Math.max(...d))}px;background:${adv?'var(--green)':'var(--red)'}"></div>
+      <div class="bl">${k}</div></div>`;
+  }
+  $("#dist").innerHTML=bars;
+  $("#distLegend").innerHTML=`X-axis = total third-placed teams finishing above Iran. <b style="color:var(--green)">Green</b> (≤7) = Iran top-8 & advances; <b style="color:var(--red)">red</b> (8+) = out. Iran's chance = green total = <b>${Math.round(pct)}%</b>.`;
 
-  $("#threats").innerHTML=S.threats.map((t,i)=>{
-    const q=qOf(t);
-    return `<div class="threat">
-      <div class="top"><div><div class="ti">${t.label}</div><div class="tm">${t.match||""}</div></div>
-        <div style="display:flex;gap:8px;align-items:center"><div class="qv">${Math.round(q*100)}%</div>
-        <div class="x" onclick="rmThreat(${i})">✕</div></div></div>
-      <div class="seg">
-        <button class="${t.res==="above"?"on above":""}" onclick="setRes(${i},'above')">finished ABOVE</button>
-        <button class="${t.res==null?"on live":""}" onclick="setRes(${i},null)">live / unknown</button>
-        <button class="${t.res==="below"?"on below":""}" onclick="setRes(${i},'below')">finished BELOW</button>
-      </div>
-      ${t.res==null?`<input type="range" min="0" max="100" value="${Math.round(t.q*100)}" oninput="setQ(${i},this.value)">
-        <div class="rnote">est. chance this group's 3rd-place team beats Iran's 3 pts / 0 GD / 3 GF</div>`:""}
-    </div>`;}).join("");
-
-  // distribution
-  const p=distribution();
-  const max=Math.max(...p);
-  $("#dist").innerHTML=p.map((v,k)=>{
-    const adv=k<=tol;
-    return `<div class="bar"><div class="bp" style="color:${adv?'var(--green)':'var(--red)'}">${(v*100).toFixed(0)}%</div>
-      <div class="b" style="height:${Math.max(2,v/max*78)}px;background:${adv?'var(--green)':'var(--red)'}"></div>
-      <div class="bl">${k} above</div></div>`;}).join("");
-  // cutoff line after index = tol
-  const frac=(tol+1)/p.length;
-  $("#cut").style.left=`calc(${frac*100}% )`;
-  $("#cutlbl").textContent=`top-8 cutoff (≤${tol} above)`;
-  $("#distLegend").innerHTML=`<b style="color:var(--green)">Green</b> = Iran advances · <b style="color:var(--red)">red</b> = Iran misses. Iran's total chance = sum of the green bars = <b>${Math.round(pct)}%</b>.`;
-
-  $("#foot").innerHTML=`Model: Iran's 3 pts / 0 GD / 3 GF is fixed; each pending group independently yields a third-place team that beats Iran with the shown probability (Poisson-binomial over the deciders). Estimates are editable and your changes are saved in this browser.<br>
-    Built ${S.updated} · <a href="https://github.com/hlash99/iran-r32-tracker">source ↗</a> · not affiliated with FIFA.`;
-  save(); publishPreview(pct);
+  // live badge + footer
+  const ago=Math.round((Date.now()-stamp)/1000);
+  $("#live").className="live"+(live?"":" stale");
+  $("#live .dot").className="dot"+(R.pending.length&&live?" pulse":"");
+  $("#liveTxt").textContent=`${live?"LIVE":"last feed"} · ESPN · updated ${new Date(stamp).toLocaleTimeString()} · auto-refresh 60s`;
+  $("#foot").innerHTML=`Live group tables & scores from ESPN's public feed, pulled in your browser every 60s. Probability via ${SIMS.toLocaleString()}-run Monte-Carlo of the remaining group matches (Poisson goal model, form-weighted). Iran's 3 pts / 0 GD / 3 GF is locked; it advances unless 8+ thirds finish above it.<br>
+    <a href="https://github.com/hlash99/iran-r32-tracker">source ↗</a> · not affiliated with FIFA or ESPN.`;
 }
 
-/* ── interactions ── */
-function setRes(i,r){S.threats[i].res=r;render();}
-function setQ(i,v){S.threats[i].q=clamp(v/100,0,1);render();}
-function rmThreat(i){S.threats.splice(i,1);render();}
-function rmLocked(i){(S.lockedBelow=S.lockedBelow||[]).push({team:S.lockedAbove[i].team,note:"slipped below Iran"});S.lockedAbove.splice(i,1);render();}
-function addThreat(){const L=$("#naddL").value.trim();if(!L)return;
-  S.threats.push({id:"t"+Date.now(),label:L,match:$("#naddM").value.trim(),q:0.5,res:null});
-  $("#naddL").value="";$("#naddM").value="";render();}
-function resetAll(){if(confirm("Reset everything to the June-26 baseline?")){S=JSON.parse(JSON.stringify(SEED));render();}}
-
-/* expose computed % for the dashboard preview (read from localStorage by the hub if same-origin; else baseline in data.json) */
-function publishPreview(pct){try{localStorage.setItem(LS+"_pct",JSON.stringify({pct:Math.round(pct),updated:S.updated}));}catch(e){}}
-
-render();
+/* ── fetch loop ── */
+async function refresh(manual){
+  try{
+    const [stJ,...scs]=await Promise.all([fetch(STAND).then(r=>r.json()),...dates.map(d=>fetch(SCORE(d)).then(r=>r.json()).catch(()=>({})))]);
+    const groups=parseStandings(stJ);
+    if(!groups.length) throw new Error("empty standings");
+    const matches=scs.flatMap(parseScore);
+    const R=compute(groups,matches);
+    const stamp=Date.now();
+    render(R,stamp,true);
+    localStorage.setItem("iranR32_live",JSON.stringify({pct:Math.round(R.pct),pos:R.iranPos,allFinal:R.allFinal,stamp}));
+  }catch(e){
+    const cached=safe(()=>JSON.parse(localStorage.getItem("iranR32_live")));
+    $("#live").className="live stale";$("#live .dot").className="dot";
+    $("#liveTxt").textContent="live feed unavailable — "+(e.message||e)+(cached?` (showing last ${new Date(cached.stamp).toLocaleTimeString()})`:"");
+    if(!document.querySelector("#tableCard table")) $("#tableMsg").textContent="Couldn't reach the live feed. It retries every 60s.";
+  }
+}
+function safe(f){try{return f();}catch(e){return null;}}
+refresh(); timer=setInterval(refresh,60000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh();});
 </script>
 </body>
 </html>
