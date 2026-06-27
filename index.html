@@ -74,7 +74,9 @@
   .match{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line)}
   .match:last-child{border-bottom:0}
   .match .g{font-size:11px;color:var(--muted);width:64px;flex:none}
-  .match .tm{flex:1;font-size:13.5px}
+  .match .tm{flex:1;font-size:13.5px;display:flex;align-items:center;gap:10px;min-width:0}
+  .match .teams{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .match .ideal{margin-left:auto;flex:none;font-size:11px;color:var(--accent);white-space:nowrap;cursor:help;opacity:.92}
   .match .sc{font-weight:750;font-size:15px;min-width:46px;text-align:center}
   .match .st{font-size:11px;width:78px;text-align:right;flex:none}
   .st.fin{color:var(--muted)} .st.liv{color:var(--amber);font-weight:600} .st.pre{color:var(--muted)}
@@ -131,6 +133,7 @@
     .gcap .n{font-size:36px}
     th,td{padding:7px 5px}
     .match .g{width:46px} .match .st{width:58px} .match .sc{min-width:38px}
+    .match .ideal{display:none}   /* hide the root-for hint on narrow screens — the teams/score come first */
   }
   .btn{border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:9px;padding:6px 12px;
        font-size:12.5px;cursor:pointer}
@@ -271,7 +274,7 @@ function compute(groups, matches){
     for(const m of (matchByGroup[gp]||[])) if(m.state!=="post"){
       const hi=idx[m.home], ai=idx[m.away]; if(hi==null||ai==null) continue;
       const left=Math.max(0,(90-m.min))/90, sh=strength[m.home]||1, sa=strength[m.away]||1;
-      nf.push({hi,ai,hs:m.hs,as:m.as,
+      nf.push({hi,ai,hs:m.hs,as:m.as,home:m.home,away:m.away,
         lh:1.35*left*Math.min(1.8,Math.max(.55,Math.exp(0.18*(sh-sa)))),
         la:1.35*left*Math.min(1.8,Math.max(.55,Math.exp(0.18*(sa-sh))))});
     }
@@ -391,6 +394,22 @@ function groupFav(G, ip, igd, igf){
   return tie?"neu":above?"bad":"good";
 }
 
+/* Which result(s) of match k (index in G.nf) keep this group's provisional 3rd from finishing ABOVE Iran —
+   i.e. the outcome(s) Iran should root for. Other matches held at their current live score.
+   Returns a subset of "HDA" (Home win / Draw / Away win). */
+function idealOutcome(G, k, ip, igd, igf){
+  const ok=r=>{
+    const P=G.bp.slice(), GD=G.bgd.slice(), GF=G.bgf.slice();
+    G.nf.forEach((mm,j)=>{ let gh,ga;
+      if(j===k){ gh=r==="H"?1:0; ga=r==="A"?1:0; } else { gh=mm.hs; ga=mm.as; }   // representative decisive result
+      GF[mm.hi]+=gh; GD[mm.hi]+=gh-ga; GF[mm.ai]+=ga; GD[mm.ai]+=ga-gh;
+      if(gh>ga) P[mm.hi]+=3; else if(gh<ga) P[mm.ai]+=3; else { P[mm.hi]++; P[mm.ai]++; } });
+    const o=[...Array(G.n).keys()].sort((a,b)=>P[b]-P[a]||GD[b]-GD[a]||GF[b]-GF[a]), ti=o[2];
+    return !(P[ti]>ip || (P[ti]===ip && (GD[ti]>igd || (GD[ti]===igd && GF[ti]>igf))));   // good = 3rd not above Iran
+  };
+  return (ok("H")?"H":"")+(ok("D")?"D":"")+(ok("A")?"A":"");
+}
+
 /* 🎉 one-off celebration when Iran advance — confetti in flag colours + a banner */
 function celebrate(){
   const cv=document.createElement("canvas");
@@ -475,7 +494,7 @@ function render(R,pct,dist){
   const kick=m=>{const d=new Date(m.date),now=new Date(),t=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
     return d.toDateString()===now.toDateString()?t:d.toLocaleDateString([],{weekday:'short'})+" "+t;};
   // favourability of each still-live group's current scoreline to Iran (only while Iran's fate is undecided)
-  const favMap={}; if(!decided) for(const G of (R.PG||[])) favMap[G.gp]=groupFav(G,R.ip,R.igd,R.igf);
+  const favMap={}, PGby={}; if(!decided) for(const G of (R.PG||[])){ favMap[G.gp]=groupFav(G,R.ip,R.igd,R.igf); PGby[G.gp]=G; }
   const FAVI={good:"▲ good for 🇮🇷",bad:"▼ bad for 🇮🇷",neu:"● neutral"},
         FAVT={good:"As it stands, this group's 3rd-placed team would finish BELOW Iran — good for Iran's chances.",
               bad:"As it stands, this group's 3rd-placed team would finish ABOVE Iran — hurts Iran's chances.",
@@ -489,9 +508,20 @@ function render(R,pct,dist){
     const tag=gp?gp.replace("Group ","").trim():(new Date(m.date)>Date.now()?"R32":"");
     const fav=(m.state==="in"&&dec&&!decided)?favMap[gp]:null;
     const favChip=fav?`<span class="favind ${fav}" title="${FAVT[fav]}">${FAVI[fav]}</span>`:"";
+    // ideal outcome Iran should root for in this group fixture (live or upcoming, while undecided)
+    let ideal="";
+    if(!decided && dec && (m.state==="in"||m.state==="pre")){
+      const G=PGby[gp], k=G?G.nf.findIndex(x=>x.home===m.home&&x.away===m.away):-1;
+      if(k>=0){
+        const s=idealOutcome(G,k,R.ip,R.igd,R.igf), f=flag(m.home), a=flag(m.away);
+        const T={H:`${f}win`,D:"draw",A:`${a}win`,HD:`${f}win/draw`,DA:`${a}win/draw`,HA:"either win",HDA:"any result",
+                 "":"no help here"}[s] ?? "any result";
+        ideal=`<span class="ideal" title="The result here that keeps this group's 3rd-placed team from finishing above Iran (other games held at their current score)">🎯 ${T}</span>`;
+      }
+    }
     return `<div class="match"${dec?' title="affects Iran"':''}>
       <span class="g">${dec?"🇮🇷 ":""}${esc(tag)}</span>
-      <span class="tm">${flag(m.home)}${A(m.hlink,esc(m.home))} <span style="color:var(--muted)">v</span> ${flag(m.away)}${A(m.alink,esc(m.away))}</span>
+      <span class="tm"><span class="teams">${flag(m.home)}${A(m.hlink,esc(m.home))} <span style="color:var(--muted)">v</span> ${flag(m.away)}${A(m.alink,esc(m.away))}</span>${ideal}</span>
       <span class="sc">${sc}</span>${favChip}<span class="st ${cl}" style="width:auto;text-align:right">${status}</span></div>`;}).join("")
     || `<div class="err">No matches in the current window — the tournament may be between rounds.</div>`;
   iranState = R.clinched?"in" : R.eliminated?"out" : (R.allFinal?(pct>=50?"in":"out"):"live"); renderNext();
