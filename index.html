@@ -4,6 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Iran · Round-of-32 Watch</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="92">🇮🇷</text></svg>'>
+<meta name="theme-color" content="#0a141f">
+<meta name="description" content="Live probability Iran advances to the 2026 World Cup Round of 32 as a best third-placed team — real-time odds, standings, schedule and scores.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="hlash99">
+<meta property="og:title" content="🇮🇷 Iran — Round-of-32 Watch">
+<meta property="og:description" content="Live World Cup advancement odds, recomputed in real time from the group tables. Standings, schedule, live scores and the title-favorite tracker.">
+<meta property="og:url" content="https://hlash99.github.io/iran-r32-tracker/">
+<meta property="og:image" content="https://hlash99.github.io/iran-r32-tracker/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🇮🇷 Iran — Round-of-32 Watch">
+<meta name="twitter:description" content="Live World Cup advancement odds, updated in real time.">
+<meta name="twitter:image" content="https://hlash99.github.io/iran-r32-tracker/og.png">
+<link rel="canonical" href="https://hlash99.github.io/iran-r32-tracker/">
 <style>
   /* palette ported from the dental review tracker (dark navy + gold/teal/green-red) */
   :root{--bg:#0a141f;--surface:#121f30;--surface2:#16273c;--line:rgba(255,255,255,.08);--ink:#eaf2fc;--muted:#8fa6bd;
@@ -67,6 +83,18 @@
   .bar .bl{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.2}
   .bar .bp{font-size:11px;font-weight:600}
   .legend{font-size:12px;color:var(--muted);margin-top:8px}
+  /* knockout bracket */
+  .bracket{display:flex;gap:16px;overflow-x:auto;padding:4px 2px 12px;-webkit-overflow-scrolling:touch}
+  .bround{display:flex;flex-direction:column;justify-content:space-around;gap:8px;min-width:138px;flex:none}
+  .bround .rh{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:center;font-weight:700;margin-bottom:2px}
+  .bx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:6px 8px}
+  .bx.iran{border-color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+  .bx .tm{display:flex;justify-content:space-between;gap:6px;white-space:nowrap;font-size:12.5px;line-height:1.5}
+  .bx .tm.win{font-weight:750}
+  .bx .tm .sc{color:var(--muted);font-variant-numeric:tabular-nums}
+  .bx .meta{font-size:10px;color:var(--muted);margin-top:3px;text-align:right}
+  .bx .meta a{color:inherit} .bx .meta .liv{color:var(--amber);font-weight:600}
+  .bx a{color:inherit} .bx a:hover{text-decoration:underline}
   footer{margin-top:32px;color:var(--muted);font-size:11.5px;line-height:1.7;text-align:center}
   .err{color:var(--amber);font-size:13px}
   @media (max-width:560px){
@@ -102,6 +130,9 @@
   <h2>Next up · Round of 32</h2>
   <div class="card" id="nextCard"><div class="err">loading bracket…</div></div>
 
+  <h2>Knockout bracket</h2>
+  <div class="card" id="bracketCard"><div class="err">loading bracket…</div></div>
+
   <h2>How many third-place teams finish above Iran?</h2>
   <div class="card"><div class="dist" id="dist"></div><div class="legend" id="distLegend"></div></div>
 
@@ -122,7 +153,7 @@ const esc=s=>(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&q
 const A=(href,txt,cls)=>href?`<a href="${esc(href)}" target="_blank" rel="noopener"${cls?` class="${cls}"`:""}>${txt}</a>`:txt;
 const FLAG={"Algeria":"🇩🇿","Argentina":"🇦🇷","Australia":"🇦🇺","Austria":"🇦🇹","Belgium":"🇧🇪","Bosnia-Herzegovina":"🇧🇦","Brazil":"🇧🇷","Canada":"🇨🇦","Cape Verde":"🇨🇻","Colombia":"🇨🇴","Congo DR":"🇨🇩","Croatia":"🇭🇷","Curaçao":"🇨🇼","Czechia":"🇨🇿","Ecuador":"🇪🇨","Egypt":"🇪🇬","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","France":"🇫🇷","Germany":"🇩🇪","Ghana":"🇬🇭","Haiti":"🇭🇹","Iran":"🇮🇷","Iraq":"🇮🇶","Ivory Coast":"🇨🇮","Japan":"🇯🇵","Jordan":"🇯🇴","Mexico":"🇲🇽","Morocco":"🇲🇦","Netherlands":"🇳🇱","New Zealand":"🇳🇿","Norway":"🇳🇴","Panama":"🇵🇦","Paraguay":"🇵🇾","Portugal":"🇵🇹","Qatar":"🇶🇦","Saudi Arabia":"🇸🇦","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Senegal":"🇸🇳","South Africa":"🇿🇦","South Korea":"🇰🇷","Spain":"🇪🇸","Sweden":"🇸🇪","Switzerland":"🇨🇭","Tunisia":"🇹🇳","Türkiye":"🇹🇷","Turkey":"🇹🇷","United States":"🇺🇸","USA":"🇺🇸","Uruguay":"🇺🇾","Uzbekistan":"🇺🇿"};
 const flag=name=>FLAG[name]?FLAG[name]+" ":"";
-let timer=null, lastStamp=0, feedOk=true, pendingLive=false, mcRun=0, nextInfo=undefined, iranState="live";
+let timer=null, lastStamp=0, feedOk=true, pendingLive=false, mcRun=0, nextInfo=undefined, iranState="live", KO=[];
 
 /* live "grabbed Xs ago" badge — ticks every second, flags staleness */
 function updateLiveBadge(){
@@ -378,20 +409,24 @@ function render(R,pct,dist){
    ESPN names Iran in the fixture) ── */
 function fmtKO(s){const d=new Date(s);return d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"})
   +" · "+d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});}
+const isPH=n=>/third place|winner|group/i.test(n);
+const gSlot=n=>/^third place group/i.test(n)&&n.replace(/^third place group /i,"").split("/").map(s=>s.trim()).includes("G");
 async function fetchNext(){
   try{
     const j=await fetch(SCORE(KO_RANGE)).then(r=>r.json());
     const evs=(j.events||[]).map(e=>{const c=e.competitions[0];
-      return {date:e.date, venue:(c.venue&&c.venue.fullName)||"", state:e.status.type.state, detail:e.status.type.shortDetail||"",
+      return {round:e.season&&e.season.slug, date:e.date, venue:(c.venue&&c.venue.fullName)||"", state:e.status.type.state, detail:e.status.type.shortDetail||"",
         link:((e.links&&(e.links.find(l=>l.rel&&l.rel.includes("summary"))||e.links[0]))||{}).href||null,
-        teams:c.competitors.map(x=>({n:x.team.displayName,s:x.score,link:(x.team.links&&x.team.links[0]&&x.team.links[0].href)||null}))};});
+        teams:c.competitors.map(x=>({n:x.team.displayName,ab:x.team.abbreviation||x.team.displayName.slice(0,3).toUpperCase(),
+          s:x.score,w:x.winner===true,link:(x.team.links&&x.team.links[0]&&x.team.links[0].href)||null}))};});
+    KO=evs;
     let m=evs.find(e=>e.teams.some(t=>/^iran$/i.test(t.n))); const confirmed=!!m;
-    if(!m) m=evs.find(e=>e.teams.some(t=>/^third place group/i.test(t.n)
-      && t.n.replace(/^third place group /i,"").split("/").map(s=>s.trim()).includes("G")));
+    if(!m) m=evs.find(e=>e.teams.some(t=>gSlot(t.n)));
     const oppT=m?(m.teams.find(t=>!/^iran$/i.test(t.n))||{}):{};
     nextInfo=m?{opp:oppT.n||"TBD", oppLink:oppT.link||null, matchLink:m.link, date:m.date, venue:m.venue,
       confirmed, state:m.state, detail:m.detail, score:m.teams.map(t=>t.s).join("–")}:null;
   }catch(e){ if(nextInfo===undefined) nextInfo=null; }
+  renderBracket();
   renderNext();
 }
 function renderNext(){
@@ -408,6 +443,37 @@ function renderNext(){
     <span class="st ${N.state==='in'?'liv':N.state==='post'?'fin':'pre'}" style="width:auto;text-align:right;white-space:nowrap">${line}</span></div>
     <div class="legend" style="margin-top:8px">${N.confirmed?"✓ Confirmed Round-of-32 matchup."
       :"Projected — <b>if</b> Iran advance as a best third. Among the open R32 slots, a Group-G third can only be placed opposite <b>"+esc(N.opp)+"</b>."}</div>`;
+}
+
+/* ── live knockout bracket from ESPN (rounds via season.slug); Iran's path in gold ── */
+const ROUNDS=[["round-of-32","Round of 32"],["round-of-16","Round of 16"],["quarterfinals","Quarters"],["semifinals","Semis"],["final","Final"]];
+function shortPH(n){return /third place/i.test(n)?"3rd "+n.replace(/^third place group /i,"").replace(/\//g,"/")
+  :n.replace(/ winner$/i," W").replace(/^winner /i,"W ");}
+function bxRow(e,t){
+  const ph=isPH(t.n), nm=ph?`<span style="color:var(--muted)">${esc(shortPH(t.n))}</span>`:`${flag(t.n)}${esc(t.ab)}`;
+  const sc=e.state==="pre"?"":`<span class="sc">${esc(t.s)}</span>`;
+  return `<div class="tm${t.w?" win":""}">${A(ph?null:t.link,nm)} ${sc}</div>`;
+}
+function bxHTML(e){
+  const iran=e.teams.some(t=>/^iran$/i.test(t.n)||gSlot(t.n));
+  const status=e.state==="in"?A(WATCH,'<span class="liv">▶ '+esc(e.detail)+'</span>')
+             :e.state==="post"?A(e.link,"FT"):A(e.link,fmtKO(e.date).split(" · ")[0]);
+  return `<div class="bx${iran?" iran":""}">${e.teams.map(t=>bxRow(e,t)).join("")}<div class="meta">${status}</div></div>`;
+}
+function renderBracket(){
+  const el=$("#bracketCard"); if(!el) return;
+  const evs=(KO||[]).filter(e=>e.round&&e.round!=="3rd-place-match");
+  const r32=evs.filter(e=>e.round==="round-of-32");
+  const set=r32.filter(e=>e.teams.every(t=>!isPH(t.n))).length;
+  if(r32.length<16 || set<8){
+    el.innerHTML=`<div class="err">The knockout bracket fills in once the group stage ends — check back after tonight's matches.</div>`; return;
+  }
+  const cols=ROUNDS.map(([slug,label])=>{
+    const ms=evs.filter(e=>e.round===slug).sort((a,b)=>new Date(a.date)-new Date(b.date)||(""+a.link).localeCompare(""+b.link));
+    return ms.length?`<div class="bround"><div class="rh">${label}</div>${ms.map(bxHTML).join("")}</div>`:"";
+  }).join("");
+  el.innerHTML=`<div class="bracket">${cols}</div>
+    <div class="legend" style="margin-top:4px">Live from ESPN · <b style="color:var(--amber)">gold</b> = Iran's path · scroll → for later rounds · scores update in real time.</div>`;
 }
 
 /* run compute+MC+render for a parsed (groups,matches); guarded so a bad shape can't blank the page */

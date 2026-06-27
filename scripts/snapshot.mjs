@@ -124,9 +124,26 @@ async function findNext() {
 // Most-likely World Cup winner via a bracket Monte-Carlo over the actual R32 pairings.
 // Ratings come from group-stage form; later rounds pair winners in bracket order (an
 // estimate). Returns null until the R32 field is concrete (i.e. the group stage is done).
+// Pre-tournament strength prior (~ FIFA ranking / market tiers, 0–100). Blended with
+// group-stage form so a strong team that merely coasted through groups stays a favorite.
+const PRIOR = {
+  "Spain":96,"Argentina":95,"France":95,"England":92,"Brazil":91,"Portugal":90,"Netherlands":87,
+  "Germany":86,"Belgium":84,"Croatia":80,"Morocco":81,"Uruguay":80,"Colombia":79,"Japan":78,
+  "Senegal":78,"Norway":78,"USA":77,"United States":77,"Switzerland":77,"Türkiye":76,"Turkey":76,
+  "Mexico":75,"Ecuador":75,"Austria":75,"Sweden":74,"Czechia":74,"Ivory Coast":74,"Canada":73,
+  "Paraguay":73,"Iran":73,"Scotland":72,"Bosnia-Herzegovina":72,"Egypt":72,"Algeria":72,"Korea Republic":71,
+  "South Korea":71,"Australia":71,"Ghana":70,"Tunisia":70,"Congo DR":68,"Qatar":66,"Saudi Arabia":66,
+  "Uzbekistan":66,"Panama":66,"South Africa":66,"Jordan":64,"Iraq":64,"Cape Verde":63,"New Zealand":62,
+  "Curaçao":60,"Haiti":58,
+};
 function teamRatings(groups) {
   const r = {};
-  groups.forEach(g => g.teams.forEach(t => { const p = Math.max(1, t.P); r[t.team] = t.pts / p + 0.4 * (t.gd / p); }));
+  groups.forEach(g => g.teams.forEach(t => {
+    const p = Math.max(1, t.P);
+    const form = 50 + 11 * (t.pts / p - 1.5) + 7 * (t.gd / p);   // group-stage form, ~30–80
+    const prior = PRIOR[t.team] ?? 65;
+    r[t.team] = 0.65 * prior + 0.35 * form;                       // 0–100 scale
+  }));
   return r;
 }
 async function computeFavorite(groups) {
@@ -139,7 +156,7 @@ async function computeFavorite(groups) {
     .map(e => e.teams.slice());
   if (pairs.length < 16) return null;                 // R32 not fully set yet
   const first = pairs.slice(0, 16);
-  const rt = teamRatings(groups), K = 0.9, rg = t => (rt[t] ?? 0);
+  const rt = teamRatings(groups), K = 0.055, rg = t => (rt[t] ?? 65);   // ratings on a 0–100 scale
   const pWin = (a, b) => 1 / (1 + Math.exp(-K * (rg(a) - rg(b))));
   const N = 20000, wins = {};
   for (let s = 0; s < N; s++) {
