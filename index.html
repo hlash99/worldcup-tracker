@@ -114,7 +114,7 @@ const LEAGUE="fifa.world", SEASON=2026;            // 2026 men's WC — swap LEA
 const STAND=`https://site.api.espn.com/apis/v2/sports/soccer/${LEAGUE}/standings?season=${SEASON}`;
 const SCORE=d=>`https://site.api.espn.com/apis/site/v2/sports/soccer/${LEAGUE}/scoreboard?dates=${d}`;
 const KO_RANGE="20260628-20260704";
-const WATCH="https://www.foxsports.com/live";      // FOX carries the 2026 WC (US, English) — live games link here
+const WATCH="https://www.youtube.com/@FOXOne/streams";   // FOX One YouTube live streams — live games link here
 const IRAN="Iran", SLOTS=8, SIMS=100000;
 const ymd=d=>d.toISOString().slice(0,10).replace(/-/g,"");
 const scoreWindow=()=>`${ymd(new Date(Date.now()-864e5))}-${ymd(new Date(Date.now()+3*864e5))}`;  // rolling: yesterday → +3d
