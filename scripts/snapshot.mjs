@@ -200,19 +200,32 @@ async function fetchWinnerMarket() {
     return Object.keys(m).length ? m : null;
   } catch { return null; }
 }
-// Blend the model's championship distribution with the betting market (60% market / 40% model)
+// Blend the model's championship distribution with the betting market (60% market / 40% model).
+// Returns the favorite plus the full ranked `contenders` table (every team with model+market+blended %).
 function blendFavorite(favModel, market) {
   if (!favModel) return null;
   const model = favModel.champ;
-  if (!market) return { favorite: favModel.favorite, favorite_pct: favModel.favorite_pct,
-    favorite_pct_model: favModel.favorite_pct, favorite_pct_market: null };
+  // blended distribution per team (falls back to pure model when no market data)
   const blended = {};
-  for (const t in model) blended[t] = 0.4 * model[t] + 0.6 * (market[norm(t)] || 0);
-  const s = Object.values(blended).reduce((a, b) => a + b, 0); if (s > 0) for (const t in blended) blended[t] /= s;
+  if (market) {
+    for (const t in model) blended[t] = 0.4 * model[t] + 0.6 * (market[norm(t)] || 0);
+    const s = Object.values(blended).reduce((a, b) => a + b, 0); if (s > 0) for (const t in blended) blended[t] /= s;
+  } else {
+    for (const t in model) blended[t] = model[t];
+  }
   let bf = null, bp = -1; for (const t in blended) if (blended[t] > bp) { bp = blended[t]; bf = t; }
+  // full leaderboard, strongest first — drives the "title odds" table on the page
+  const contenders = Object.keys(blended)
+    .map(t => ({ team: t,
+      pct: Math.round(blended[t] * 100),
+      pct_model: Math.round((model[t] || 0) * 100),
+      pct_market: market ? Math.round((market[norm(t)] || 0) * 100) : null }))
+    .sort((a, b) => blended[b.team] - blended[a.team])
+    .filter((c, i) => i < 12 || c.pct >= 1);
   return { favorite: bf, favorite_pct: Math.round(bp * 100),
     favorite_pct_model: Math.round((model[bf] || 0) * 100),
-    favorite_pct_market: Math.round((market[norm(bf)] || 0) * 100) };
+    favorite_pct_market: market ? Math.round((market[norm(bf)] || 0) * 100) : null,
+    contenders };
 }
 
 async function main() {
@@ -265,6 +278,7 @@ async function main() {
     favorite_pct: fav ? fav.favorite_pct : null,
     favorite_pct_model: fav ? fav.favorite_pct_model : null,
     favorite_pct_market: fav ? fav.favorite_pct_market : null,
+    contenders: fav ? fav.contenders : null,
     live: true,
     source: "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   };

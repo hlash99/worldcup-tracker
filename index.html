@@ -171,7 +171,7 @@
     </section>
 
     <section class="block" data-block="table"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
-      <h2>Best third-placed teams — live table (top 8 advance)</h2>
+      <h2 id="tableLabel">Best third-placed teams — live table (top 8 advance)</h2>
       <div class="card" id="tableCard"><div class="err" id="tableMsg">loading…</div></div>
     </section>
 
@@ -539,15 +539,31 @@ function render(R,pct,dist){
         <span class="pill"><b>${R.pending.length}</b> group${R.pending.length!==1?"s":""} live</span></div>`;
   }
 
-  // third-place table (top 10)
-  const rows=R.ranked.slice(0,10).map((r,i)=>{
-    const isIran=r.t.team===IRAN, pos=i+1;
-    const tag=r.done?`<span class="tag">final</span>`:`<span class="tag live">live</span>`;
-    return `<tr class="${isIran?"iran":""} ${pos===SLOTS?"cut":""}">
-      <td>${pos}</td><td>${flag(r.t.team)}${A(r.t.link,esc(r.t.team))} <span style="color:var(--muted);font-size:11px">${r.group.replace("Group ","Grp ")}</span></td>
-      <td>${r.t.pts}</td><td>${r.t.gd>=0?"+":""}${r.t.gd}</td><td>${r.t.gf}</td><td>${tag}</td></tr>`;}).join("");
-  $("#tableCard").innerHTML=`<table><thead><tr><th>#</th><th>Team</th><th>Pts</th><th>GD</th><th>GF</th><th></th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="legend" style="margin-top:8px">Dashed line = top-8 cutoff. Ranked by points → goal difference → goals for (FIFA tiebreakers).</div>`;
+  // Table block — flips with Iran's fate:
+  //  • Iran out → the best-third race is dead, so show the live World Cup title-odds leaderboard
+  //    (model blended with the betting market, computed server-side) to match the pivoted gauge.
+  //  • otherwise → the best third-placed teams race that drives Iran's qualification.
+  if(fav && fav.contenders && fav.contenders.length){
+    $("#tableLabel").textContent="World Cup title odds — live leaderboard";
+    const hasMkt=fav.contenders.some(c=>c.pct_market!=null);
+    const rows=fav.contenders.slice(0,12).map((c,i)=>{
+      const top=i===0;
+      return `<tr class="${top?"iran":""}">
+        <td>${i+1}</td><td>${flag(c.team)}${esc(c.team)}${top?' <span style="color:var(--muted);font-size:11px">favorite</span>':""}</td>
+        <td><b>${c.pct}%</b></td><td style="color:var(--muted)">${c.pct_model!=null?c.pct_model+"%":"–"}</td>${hasMkt?`<td style="color:var(--muted)">${c.pct_market!=null?c.pct_market+"%":"–"}</td>`:""}</tr>`;}).join("");
+    $("#tableCard").innerHTML=`<table><thead><tr><th>#</th><th>Team</th><th>Win</th><th>Model</th>${hasMkt?"<th>Market</th>":""}</tr></thead><tbody>${rows}</tbody></table>
+      <div class="legend" style="margin-top:8px">Chance to win the 2026 World Cup — bracket Monte-Carlo (form + FIFA-tier prior)${hasMkt?", blended 40/60 with Kalshi's live market":""}. Updated server-side every ~10 min.</div>`;
+  } else {
+    $("#tableLabel").textContent="Best third-placed teams — live table (top 8 advance)";
+    const rows=R.ranked.slice(0,10).map((r,i)=>{
+      const isIran=r.t.team===IRAN, pos=i+1;
+      const tag=r.done?`<span class="tag">final</span>`:`<span class="tag live">live</span>`;
+      return `<tr class="${isIran?"iran":""} ${pos===SLOTS?"cut":""}">
+        <td>${pos}</td><td>${flag(r.t.team)}${A(r.t.link,esc(r.t.team))} <span style="color:var(--muted);font-size:11px">${r.group.replace("Group ","Grp ")}</span></td>
+        <td>${r.t.pts}</td><td>${r.t.gd>=0?"+":""}${r.t.gd}</td><td>${r.t.gf}</td><td>${tag}</td></tr>`;}).join("");
+    $("#tableCard").innerHTML=`<table><thead><tr><th>#</th><th>Team</th><th>Pts</th><th>GD</th><th>GF</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="legend" style="margin-top:8px">Dashed line = top-8 cutoff. Ranked by points → goal difference → goals for (FIFA tiebreakers).</div>`;
+  }
 
   // ── general live board: all live + today's matches (+ a few upcoming) — stays useful all tournament ──
   const all=R.allMatches||[], todayStr=new Date().toDateString();
