@@ -332,7 +332,20 @@ function parseScore(j){
 /* ── group helpers ── */
 function rankTeams(ts){return ts.slice().sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);}
 function thirdOf(g){return rankTeams(g.teams)[2];}
-function aboveIran(t,ir){return (t.pts>ir.pts)||(t.pts===ir.pts&&t.gd>ir.gd)||(t.pts===ir.pts&&t.gd===ir.gd&&t.gf>ir.gf);}
+function betterRec(a,b){return (a.pts>b.pts)||(a.pts===b.pts&&a.gd>b.gd)||(a.pts===b.pts&&a.gd===b.gd&&a.gf>b.gf);}
+function aboveIran(t,ir){return betterRec(t,ir);}
+/* Format detection — adapts to whatever tournament is loaded rather than assuming the 48-team men's
+   shape. From the number of groups it derives the knockout size (next power of two ≥ 2 per group) and
+   how many "best (N+1)th-placed" wildcard slots exist:
+     12 groups → 32-team KO → top-2 (24) + 8 best thirds   (men's 2026/2030)
+      8 groups → 16-team KO → top-2 (16) + 0 best thirds    (women's 32-team: top-2 only)
+      6 groups → 16-team KO → top-2 (12) + 4 best thirds    (older formats)
+   advancePerGroup is 2 in every modern World Cup; bestRank is the first non-auto rank (3rd). */
+function detectFormat(groups){
+  const G=Math.max(1,groups.length), advancePerGroup=2;
+  const koSize=Math.pow(2,Math.ceil(Math.log2(Math.max(2,advancePerGroup*G))));
+  return {groups:G, advancePerGroup, bestRank:advancePerGroup+1, koSize, bestSlots:Math.max(0,koSize-advancePerGroup*G)};
+}
 
 /* ── poisson goal sampler ── */
 function pois(l){let L=Math.exp(-l),k=0,p=1;do{k++;p*=Math.random();}while(p>L);return k-1;}
@@ -347,7 +360,7 @@ function compute(groups, matches){
   // title tracker (gauge/table/bracket follow the favorite), same as the post-elimination state.
   if(!iran) return {noIran:true, iran:null, iranPos:0, ranked:[], pending:[], liveMatches:[],
     matchByGroup:matchByGroup0, teamGroup, allMatches:matches, ip:0, igd:0, igf:0, PG:[],
-    baseAbove:0, clinched:false, eliminated:true, allFinal:true};
+    baseThirds:[], iranFixed:null, baseAbove:0, format:detectFormat(groups), clinched:false, eliminated:true, allFinal:true};
   // A group is only truly final when all its matches have actually ended. ESPN bumps gamesPlayed
   // (and provisional points/GD) the instant a match kicks off, so judging "done" on P>=3 alone used
   // to mark a still-live group final at half-time — locking in the partial score and snapping the
@@ -363,13 +376,18 @@ function compute(groups, matches){
   // strength proxy from current form (pts/game + 0.3*gd/game)
   const strength={}; groups.forEach(g=>g.teams.forEach(t=>{const p=Math.max(1,t.P); strength[t.team]=t.pts/p+0.3*t.gd/p;}));
 
-  // current third-place table
-  const thirds=groups.map(g=>({group:g.group, t:thirdOf(g), done:groupDone(g)}));
+  const fmt=detectFormat(groups), adv=fmt.advancePerGroup, bestSlots=fmt.bestSlots;
+  const iranGroupName=teamGroup[IRAN];
+
+  // wildcard-rank ((adv+1)th, i.e. "3rd") table — the headline race in best-third formats; informational otherwise
+  const thirds=groups.map(g=>({group:g.group, t:rankTeams(g.teams)[adv], done:groupDone(g)})).filter(r=>r.t);
   const ranked=thirds.slice().sort((a,b)=>b.t.pts-a.t.pts||b.t.gd-a.t.gd||b.t.gf-a.t.gf);
   const iranPos=ranked.findIndex(r=>r.t.team===IRAN)+1;
-  const pending=thirds.filter(r=>!r.done).map(r=>r.group);
+  const pending=groups.filter(g=>!groupDone(g)).map(g=>g.group);
 
-  // Monte-Carlo of the remaining matches — precomputed & allocation-light so 100k+ stays fast
+  // Monte-Carlo of the remaining matches — precomputed & allocation-light so 100k+ stays fast.
+  // Every pending group is simulated (incl. Iran's own, if still live), so Iran's finishing position
+  // is modelled directly — not assumed. iranIdx flags Iran's slot in a group (or -1).
   const ip=iran.pts, igd=iran.gd, igf=iran.gf;
   const PG=pending.map(gp=>{
     const ts=groups.find(x=>x.group===gp).teams, n=ts.length, idx={};
@@ -383,27 +401,58 @@ function compute(groups, matches){
         la:1.35*left*Math.min(1.8,Math.max(.55,Math.exp(0.18*(sa-sh))))});
     }
     return {gp,n,bp:ts.map(t=>t.pts),bgd:ts.map(t=>t.gd),bgf:ts.map(t=>t.gf),
-            P:new Array(n),GD:new Array(n),GF:new Array(n),ord:ts.map((_,i)=>i),nf};
+            P:new Array(n),GD:new Array(n),GF:new Array(n),ord:ts.map((_,i)=>i),nf,
+            iranIdx: idx[IRAN]==null?-1:idx[IRAN]};
   });
-  const baseAbove= thirds.filter(r=>r.done && r.t.team!==IRAN && aboveIran(r.t,iran)).length;
-  // Deterministic early outcomes (don't wait for the last game):
-  //  • clinched  — even if every still-live group produces a third better than Iran, Iran stays top-8
-  //  • eliminated — 8 thirds are already locked above Iran
-  const clinched   = baseAbove + pending.length <= SLOTS-1;
-  const eliminated = baseAbove >= SLOTS;
+
+  // Iran's qualification setup. Direct if top-`adv`; otherwise compete for `bestSlots` wildcard slots among
+  // the (adv+1)-ranked teams (zero such slots in a top-2-only format ⇒ finishing 3rd means out).
+  // baseThirds = finished groups' wildcard-rank teams (Iran's own handled via iranFixed).
+  const baseThirds=[]; let iranFixed=null;
+  groups.forEach(g=>{
+    if(!groupDone(g)) return;
+    const r=rankTeams(g.teams);
+    if(g.group===iranGroupName){
+      const rk=r.findIndex(t=>t.team===IRAN);
+      iranFixed={rank:rk, third:{pts:ip,gd:igd,gf:igf}};
+      if(rk!==adv && r[adv]) baseThirds.push({pts:r[adv].pts,gd:r[adv].gd,gf:r[adv].gf});
+    } else if(r[adv]) baseThirds.push({pts:r[adv].pts,gd:r[adv].gd,gf:r[adv].gf});
+  });
+  const baseAbove = iranFixed&&iranFixed.rank===adv ? baseThirds.filter(t=>betterRec(t,iranFixed.third)).length : 0;
+  // Deterministic early calls, only when Iran's own group is already final:
+  let clinched=false, eliminated=false;
+  if(iranFixed){
+    if(iranFixed.rank<adv) clinched=true;                     // finished top-2 → through
+    else if(iranFixed.rank>adv) eliminated=true;              // finished below wildcard rank → out
+    else { clinched = baseAbove + PG.length <= bestSlots-1;   // even if every live group beats Iran, still in
+           eliminated = baseAbove >= bestSlots; }             // enough wildcards already above Iran (0 ⇒ out in top-2 formats)
+  }
+  const iranGroupStanding=rankTeams((groups.find(g=>g.group===iranGroupName)||{teams:[]}).teams);
+  const iranGroupRank=iranGroupStanding.findIndex(t=>t.team===IRAN)+1;
   return {iran,iranPos,ranked,pending,liveMatches,matchByGroup,teamGroup,allMatches:matches,
-          ip,igd,igf,PG,baseAbove, clinched, eliminated, allFinal:pending.length===0};
+          ip,igd,igf,PG,baseThirds,iranFixed,baseAbove,format:fmt,
+          iranGroupName,iranGroupRank,iranGroupStanding, clinched, eliminated, allFinal:pending.length===0};
 }
 
-/* Monte-Carlo of the remaining matches, chunked across timeouts so 100k runs never block the needle */
+/* Monte-Carlo of the remaining matches, chunked across timeouts so 100k runs never block the needle.
+   General & format-aware: each sim finalises every pending group, finds Iran's finishing position, and
+   asks "does Iran qualify?" = top-`adv`, OR (when bestSlots>0) Iran is its group's wildcard-rank team
+   and fewer than bestSlots wildcard teams finish above it. */
 function runMC(F, done){
-  const PG=F.PG, base=F.baseAbove, ip=F.ip, igd=F.igd, igf=F.igf;
-  const dist=new Array(13).fill(0), CH=8000; let s=0, advance=0;
-  if(!PG.length){ dist[base]=1; done(base<SLOTS?100:0, dist); return; }
+  const fmt=F.format, adv=fmt.advancePerGroup, bestSlots=fmt.bestSlots;
+  const PG=F.PG, baseThirds=F.baseThirds, iranFixed=F.iranFixed, CH=8000; let s=0, advance=0;
+  if(iranFixed && iranFixed.rank<adv){ done(100); return; }   // Iran already top-2
+  if(iranFixed && iranFixed.rank>adv){ done(0); return; }      // Iran already below the wildcard rank
+  if(!PG.length){                                              // all final, Iran is a fixed wildcard team
+    const cnt=iranFixed?baseThirds.filter(t=>betterRec(t,iranFixed.third)).length:1e9;
+    done(bestSlots>0 && cnt<bestSlots?100:0); return;
+  }
   (function step(){
     const end=Math.min(s+CH,SIMS);
     for(;s<end;s++){
-      let above=base;
+      let iranDirect=false, iranOut=!!(iranFixed&&iranFixed.rank>adv);
+      let iranIsWild=!!(iranFixed&&iranFixed.rank===adv), iranRec=iranIsWild?iranFixed.third:null;
+      const pendThirds=[];
       for(let gi=0;gi<PG.length;gi++){
         const G=PG[gi], n=G.n, P=G.P, GD=G.GD, GF=G.GF;
         for(let i=0;i<n;i++){P[i]=G.bp[i];GD[i]=G.bgd[i];GF[i]=G.bgf[i];}
@@ -413,13 +462,24 @@ function runMC(F, done){
           if(gh>ga)P[m.hi]+=3; else if(gh<ga)P[m.ai]+=3; else {P[m.hi]++;P[m.ai]++;}
         }
         const o=G.ord; o.sort((a,b)=>P[b]-P[a]||GD[b]-GD[a]||GF[b]-GF[a]);
-        const ti=o[2];
-        if(P[ti]>ip||(P[ti]===ip&&GD[ti]>igd)||(P[ti]===ip&&GD[ti]===igd&&GF[ti]>igf)) above++;
+        const wi=o[adv];
+        if(G.iranIdx>=0){
+          const rk=o.indexOf(G.iranIdx);
+          if(rk<adv) iranDirect=true; else if(rk===adv){ iranIsWild=true; iranRec={pts:P[G.iranIdx],gd:GD[G.iranIdx],gf:GF[G.iranIdx]}; } else iranOut=true;
+          if(rk!==adv && wi!=null) pendThirds.push({pts:P[wi],gd:GD[wi],gf:GF[wi]});
+        } else if(wi!=null){ pendThirds.push({pts:P[wi],gd:GD[wi],gf:GF[wi]}); }
       }
-      dist[above]++; if(above<SLOTS) advance++;
+      let q=false;
+      if(iranDirect) q=true;
+      else if(!iranOut && iranIsWild && bestSlots>0 && iranRec){
+        let above=0;
+        for(let i=0;i<baseThirds.length;i++) if(betterRec(baseThirds[i],iranRec)) above++;
+        for(let i=0;i<pendThirds.length;i++) if(betterRec(pendThirds[i],iranRec)) above++;
+        if(above<bestSlots) q=true;
+      }
+      if(q) advance++;
     }
-    if(s<SIMS) setTimeout(step,0);
-    else done(advance/SIMS*100, dist.map(c=>c/SIMS));
+    if(s<SIMS) setTimeout(step,0); else done(advance/SIMS*100);
   })();
 }
 
@@ -545,6 +605,16 @@ function renderNeeds(R){
   if(R.noIran){ if(lbl)lbl.textContent="Iran & this tournament";
     el.innerHTML=`<div class="needhd">🇮🇷 Iran aren't in this World Cup — there's no qualification to track, so the page follows the title race instead.</div>`; return; }
   if(lbl)lbl.textContent="What needs to happen";
+  // The per-group "routes" below only make sense for the classic best-third chase (Iran finished as a
+  // wildcard-rank team, other groups still deciding). For any other shape — Iran's own group still live,
+  // Iran already top-2/4th, or a top-2-only format with no wildcards — show a concise general status.
+  const F=R.format||{}, adv=F.advancePerGroup||2, bs=F.bestSlots||0, ordN=n=>n+(["","st","nd","rd"][n]||"th");
+  if(!(bs>0 && R.iranFixed && R.iranFixed.rank===adv)){
+    el.innerHTML = R.clinched?`<div class="needhd good">✅ Iran are through to the knockouts.</div>`
+      : R.eliminated?`<div class="needhd bad">❌ Iran are out.</div>`
+      : `<div class="needhd">Iran advance by finishing in the <b>top ${adv}</b> of ${esc(R.iranGroupName||"their group")}${bs>0?`, or as one of the <b>${bs}</b> best ${ordN(adv+1)}-placed teams`:""}. They're currently <b>${ordN(R.iranGroupRank||0)}</b>${R.pending&&R.pending.length?` — ${R.pending.length} group${R.pending.length!==1?"s":""} still live`:""}.</div>`;
+    return;
+  }
   const rows=[], pend=new Set();
   for(const G of (R.PG||[])){
     pend.add(G.gp);
@@ -627,15 +697,19 @@ function render(R,pct,dist){
   } else {
     const clinch = decided==="in"?"QUALIFIED ✓" : decided==="out"?"ELIMINATED" : null;
     setGauge(shown, !!decided, clinch, ["OUT","IN"]);
-    const note = R.clinched?`Iran have <b>clinched</b> a Round-of-32 spot — confirmed before the group stage even finished.`
-      : R.eliminated?`Iran are <b>out</b> — ${R.baseAbove} third-placed teams finished above them.`
+    const F=R.format, adv=F.advancePerGroup, bs=F.bestSlots, ord=n=>n+(["","st","nd","rd"][n]||"th");
+    const koName=F.koSize===32?"Round of 32":F.koSize===16?"Round of 16":F.koSize===8?"the quarter-finals":`the last ${F.koSize}`;
+    const wildId=ord(adv+1);   // e.g. "3rd"
+    const note = R.clinched?`Iran have <b>clinched</b> a place in ${koName}.`
+      : R.eliminated?(R.iranFixed&&R.iranFixed.rank<adv?`Iran are <b>through</b>.`
+          : bs>0?`Iran are <b>out</b> — ${R.baseAbove} better ${wildId}-placed team${R.baseAbove!==1?"s":""} already locked above them.`
+                :`Iran are <b>out</b> — only the top ${adv} of each group advance.`)
       : R.allFinal?"All groups are final."
-      : `Iran are out only if <b>all ${R.pending.length}</b> still-live group${R.pending.length>1?"s":""} (${R.pending.join(", ")}) produce a third better than Iran's record${R.pending.length>1?` — Iran clinch the moment any one of those groups doesn't`:""}.`;
-    const iranGrp=(R.teamGroup&&R.teamGroup[IRAN])?R.teamGroup[IRAN].replace("Group ","Group "):"their group";
-    $("#verdict").innerHTML=`<p>Iran sit 3rd in <b>${esc(iranGrp)}</b> on <b>${ir.pts} pts · ${ir.gd>=0?"+":""}${ir.gd} GD · ${ir.gf} GF</b>, currently
-      <b>${R.iranPos}${["","st","nd","rd"][R.iranPos]||"th"}</b> of the ${R.ranked.length} third-placed teams. ${note}</p>
-      <div class="pills"><span class="pill"><b>${SLOTS}</b> thirds advance</span>
-        <span class="pill"><b>${R.baseAbove}</b> locked above</span>
+      : bs>0?`Iran advance by finishing <b>top ${adv}</b>, or as one of the <b>${bs}</b> best ${wildId}-placed teams.`
+            :`Iran advance by finishing in the <b>top ${adv}</b> of their group.`;
+    $("#verdict").innerHTML=`<p>Iran are <b>${ord(R.iranGroupRank||0)}</b> in <b>${esc(R.iranGroupName||"their group")}</b> on <b>${ir.pts} pts · ${ir.gd>=0?"+":""}${ir.gd} GD · ${ir.gf} GF</b>. ${note}</p>
+      <div class="pills"><span class="pill">top <b>${adv}</b> advance${bs>0?` + <b>${bs}</b> best ${wildId}s`:""}</span>
+        ${bs>0&&R.iranFixed&&R.iranFixed.rank===adv?`<span class="pill"><b>${R.baseAbove}</b> locked above</span>`:""}
         <span class="pill"><b>${R.pending.length}</b> group${R.pending.length!==1?"s":""} live</span></div>`;
   }
 
@@ -643,29 +717,40 @@ function render(R,pct,dist){
   //  • Iran out → the best-third race is dead, so show the live World Cup title-odds leaderboard
   //    (model blended with the betting market, computed server-side) to match the pivoted gauge.
   //  • otherwise → the best third-placed teams race that drives Iran's qualification.
+  const fmtT=R.format||{advancePerGroup:2,bestSlots:8}, advT=fmtT.advancePerGroup, ordT=n=>n+(["","st","nd","rd"][n]||"th");
   if(fav && fav.contenders && fav.contenders.length){
     $("#tableLabel").textContent="World Cup title odds — live leaderboard";
-    const hasMkt=fav.contenders.some(c=>c.pct_market!=null);
+    const hasMkt=fav.contenders.some(c=>c.pct_market!=null), hasRec=fav.contenders.some(c=>c.record);
     const rows=fav.contenders.slice(0,12).map((c,i)=>{
       const top=i===0;
       return `<tr class="${top?"iran":""}">
         <td>${i+1}</td><td>${flag(c.team)}${esc(c.team)}${top?' <span style="color:var(--muted);font-size:11px">favorite</span>':""}</td>
-        <td><b>${c.pct}%</b></td><td style="color:var(--muted)">${c.pct_model!=null?c.pct_model+"%":"–"}</td>${hasMkt?`<td style="color:var(--muted)">${c.pct_market!=null?c.pct_market+"%":"–"}</td>`:""}</tr>`;}).join("");
-    $("#tableCard").innerHTML=`<table><thead><tr><th>#</th><th>Team</th><th>Win</th><th>Model</th>${hasMkt?"<th>Market</th>":""}</tr></thead><tbody>${rows}</tbody></table>
-      <div class="legend" style="margin-top:8px">Chance to win the ${SEASON} World Cup — bracket Monte-Carlo (form + FIFA-tier prior)${hasMkt?", blended 40/60 with Kalshi's live market":""}. Updated server-side every ~10 min.</div>`;
+        ${hasRec?`<td style="color:var(--muted)">${esc(c.record||"–")}</td>`:""}<td><b>${c.pct}%</b></td><td style="color:var(--muted)">${c.pct_model!=null?c.pct_model+"%":"–"}</td>${hasMkt?`<td style="color:var(--muted)">${c.pct_market!=null?c.pct_market+"%":"–"}</td>`:""}</tr>`;}).join("");
+    $("#tableCard").innerHTML=`<table><thead><tr><th>#</th><th>Team</th>${hasRec?"<th>W-D-L</th>":""}<th>Win</th><th>Model</th>${hasMkt?"<th>Market</th>":""}</tr></thead><tbody>${rows}</tbody></table>
+      <div class="legend" style="margin-top:8px">Chance to win the ${SEASON} World Cup — bracket Monte-Carlo (form + FIFA-tier prior)${hasMkt?", blended 40/60 with Kalshi's live market":""}.${hasRec?" W-D-L = record so far this tournament.":""} Updated server-side every ~10 min.</div>`;
   } else if(R.noIran){
     $("#tableLabel").textContent="World Cup title odds — live leaderboard";
-    $("#tableCard").innerHTML=`<div class="err">Title odds appear once the Round-of-32 bracket is set after the group stage.</div>`;
-  } else {
-    $("#tableLabel").textContent="Best third-placed teams — live table (top 8 advance)";
-    const rows=R.ranked.slice(0,10).map((r,i)=>{
+    $("#tableCard").innerHTML=`<div class="err">Title odds appear once the knockout bracket is set after the group stage.</div>`;
+  } else if(fmtT.bestSlots>0){
+    // best-third format → the wildcard race that drives Iran's qualification
+    const bs=fmtT.bestSlots, wildId=ordT(advT+1);
+    $("#tableLabel").textContent=`Best ${wildId}-placed teams — live table (top ${bs} advance)`;
+    const rows=R.ranked.slice(0,Math.max(10,bs+2)).map((r,i)=>{
       const isIran=r.t.team===IRAN, pos=i+1;
       const tag=r.done?`<span class="tag">final</span>`:`<span class="tag live">live</span>`;
-      return `<tr class="${isIran?"iran":""} ${pos===SLOTS?"cut":""}">
+      return `<tr class="${isIran?"iran":""} ${pos===bs?"cut":""}">
         <td>${pos}</td><td>${flag(r.t.team)}${A(r.t.link,esc(r.t.team))} <span style="color:var(--muted);font-size:11px">${r.group.replace("Group ","Grp ")}</span></td>
         <td>${r.t.pts}</td><td>${r.t.gd>=0?"+":""}${r.t.gd}</td><td>${r.t.gf}</td><td>${tag}</td></tr>`;}).join("");
     $("#tableCard").innerHTML=`<table><thead><tr><th>#</th><th>Team</th><th>Pts</th><th>GD</th><th>GF</th><th></th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="legend" style="margin-top:8px">Dashed line = top-8 cutoff. Ranked by points → goal difference → goals for (FIFA tiebreakers).</div>`;
+      <div class="legend" style="margin-top:8px">Dashed line = top-${bs} cutoff. Ranked by points → goal difference → goals for (FIFA tiebreakers).</div>`;
+  } else {
+    // top-2-only format (e.g. 32-team WC) → Iran's group is the race that matters
+    $("#tableLabel").textContent=`${esc(R.iranGroupName||"Iran's group")} — live standings (top ${advT} advance)`;
+    const rows=(R.iranGroupStanding||[]).map((t,i)=>{const isIran=t.team===IRAN,pos=i+1;
+      return `<tr class="${isIran?"iran":""} ${pos===advT?"cut":""}">
+        <td>${pos}</td><td>${flag(t.team)}${A(t.link,esc(t.team))}</td><td>${t.pts}</td><td>${t.gd>=0?"+":""}${t.gd}</td><td>${t.gf}</td></tr>`;}).join("");
+    $("#tableCard").innerHTML=`<table><thead><tr><th>#</th><th>Team</th><th>Pts</th><th>GD</th><th>GF</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="legend" style="margin-top:8px">Dashed line = top-${advT} cutoff. Ranked by points → goal difference → goals for.</div>`;
   }
 
   // ── general live board: all live + today's matches (+ a few upcoming) — stays useful all tournament ──
@@ -728,15 +813,19 @@ function render(R,pct,dist){
            : iranState==="out" ? (fv?"World Cup — Title Watch":"Iran — Out in the group stage")
            : "Iran — Round-of-32 Watch";
   $("#h1").innerHTML=`<span class="flag">${(iranState==="out"&&fv)||(noIran&&fv)?"🏆":"🇮🇷"}</span> ${h1}`;
+  const Fs=R.format||{advancePerGroup:2,bestSlots:8,koSize:32}, ordS=n=>n+(["","st","nd","rd"][n]||"th");
+  const knockN=Fs.koSize===32?"Round of 32":Fs.koSize===16?"Round of 16":"the knockouts";
   $("#sub").innerHTML = iranState==="in"
-      ? `Iran are <b>through to the Round of 32</b> — now tracking their knockout path, the bracket and live scores.`
+      ? `Iran are <b>through to ${knockN}</b> — now tracking their knockout path, the bracket and live scores.`
     : noIran
       ? (fv?`🇮🇷 Iran aren't in this World Cup — the page is a live <b>title tracker</b>: the favorite (model blended with the betting markets), full odds table and the bracket.`
            :`🇮🇷 Iran aren't in this World Cup — once the group stage ends this becomes a live title & knockout tracker.`)
     : iranState==="out"
       ? (fv?`🇮🇷 Iran were eliminated in the group stage. The meter now tracks the <b>live World Cup title favorite</b> — the model blended with the betting markets.`
            :`🇮🇷 Iran were eliminated in the group stage — this page is now a live World Cup knockout tracker.`)
-      : `Live probability Iran advances as one of the <b>8 best third-placed teams</b> — computed in real time from the live group tables.`;
+    : Fs.bestSlots>0
+      ? `Live probability Iran reach ${knockN} — by finishing top ${Fs.advancePerGroup} or among the <b>${Fs.bestSlots}</b> best ${ordS(Fs.advancePerGroup+1)}-placed teams — computed in real time.`
+      : `Live probability Iran finish <b>top ${Fs.advancePerGroup}</b> of their group to reach ${knockN} — computed in real time from the live tables.`;
   document.title = iranState==="in" ? "🇮🇷 Iran are THROUGH ✓"
     : (noIran||iranState==="out") ? (fv?`🏆 ${fv.favorite} ${fv.favorite_pct}% — WC favorite`:(noIran?"World Cup tracker":"Iran — eliminated"))
     : `Iran R32: ${Math.round(shown)}%`;

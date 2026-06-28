@@ -210,6 +210,21 @@ function teamRatings(groups) {
   }));
   return r;
 }
+// Each team's W-D-L across the whole tournament (group + knockouts) from completed matches.
+// FIFA convention: a knockout decided on penalties counts as a draw (we go by the 90'/ET score).
+async function teamRecords() {
+  let j; try { j = await getScoreboardJSON(`${SEASON}0601-${SEASON}0815`); } catch { return {}; }
+  const rec = {};
+  for (const e of findEvents(j)) {
+    const c = e.competitions && e.competitions[0]; if (!c || !c.competitors || c.competitors.length < 2) continue;
+    const tp = e.status && e.status.type; if (!tp || tp.state !== "post") continue;
+    const [a, b] = c.competitors; if (!a.team || !b.team) continue;
+    const an = norm(a.team.displayName), bn = norm(b.team.displayName), as = +a.score || 0, bs = +b.score || 0;
+    rec[an] = rec[an] || { w: 0, d: 0, l: 0 }; rec[bn] = rec[bn] || { w: 0, d: 0, l: 0 };
+    if (as > bs) { rec[an].w++; rec[bn].l++; } else if (as < bs) { rec[an].l++; rec[bn].w++; } else { rec[an].d++; rec[bn].d++; }
+  }
+  return rec;
+}
 async function computeFavorite(groups) {
   let j; try { j = await getScoreboardJSON(`${SEASON}0601-${SEASON}0815`); } catch { return null; }
   const ph = t => /third place|winner|group/i.test(t);
@@ -317,8 +332,9 @@ async function main() {
     : R.allFinal ? (R.pct >= 50 ? "advanced" : "eliminated") : "live";
   const shown = R.noIran ? null : Math.round(displayPct(R));   // calibrated, snaps to 100/0 when clinched/eliminated
   // Kalshi's winner market is men's-only (KXMENWORLDCUP); for the Women's WC fall back to model-only
-  const [favModel, market] = await Promise.all([computeFavorite(groups), LEAGUE === "fifa.world" ? fetchWinnerMarket() : null]);
+  const [favModel, market, recs] = await Promise.all([computeFavorite(groups), LEAGUE === "fifa.world" ? fetchWinnerMarket() : null, teamRecords()]);
   const fav = blendFavorite(favModel, market);   // WC winner: model blended with market (null until R32 set)
+  if (fav && fav.contenders) for (const c of fav.contenders) { const r = recs[norm(c.team)]; c.record = r ? `${r.w}-${r.d}-${r.l}` : null; }   // attach each team's W-D-L
 
   const prev = JSON.parse(readFileSync(join(ROOT, "data.json"), "utf8"));
   const out = {
