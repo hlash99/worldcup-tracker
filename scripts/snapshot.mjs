@@ -99,6 +99,23 @@ async function getScoreboardJSON(dates) { for (const s of SOURCES()) { try { con
 const rankTeams = ts => ts.slice().sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
 const thirdOf = g => rankTeams(g.teams)[2];
 const aboveIran = (t, ir) => (t.pts > ir.pts) || (t.pts === ir.pts && t.gd > ir.gd) || (t.pts === ir.pts && t.gd === ir.gd && t.gf > ir.gf);
+// Collusion / "biscotto": flag a remaining match where a DRAW sends BOTH teams through no matter what
+// else happens, but a decisive result wouldn't — so both share an incentive to draw. The MC then forces
+// the convenient draw a fraction COLLUDE_P of the time. (Mirrors the page; adv = teams that advance/group.)
+const COLLUDE_P = 0.40;
+function markCollusion(ts, nf, adv) {
+  if (nf.length < 1 || nf.length > 4) return;
+  const n = ts.length, bp = ts.map(t => t.pts), RES = ["H", "D", "A"];
+  const ptsAfter = assign => { const P = bp.slice();
+    for (let j = 0; j < nf.length; j++) { const m = nf[j], r = assign[j]; if (r === "H") P[m.hi] += 3; else if (r === "A") P[m.ai] += 3; else { P[m.hi]++; P[m.ai]++; } }
+    return P; };
+  // "safely top-adv" = fewer than adv OTHER teams equal-or-beat it on points → guaranteed regardless of tiebreaks
+  const safe = (P, i) => { let ge = 0; for (let j = 0; j < n; j++) if (j !== i && P[j] >= P[i]) ge++; return ge < adv; };
+  const bothSafe = (k, tr) => { const others = []; for (let j = 0; j < nf.length; j++) if (j !== k) others.push(j);
+    let ok = true; const rec = (i, a) => { if (!ok) return; if (i === others.length) { a[k] = tr; const P = ptsAfter(a); if (!(safe(P, nf[k].hi) && safe(P, nf[k].ai))) ok = false; return; }
+      for (const r of RES) { a[others[i]] = r; rec(i + 1, a); } }; rec(0, new Array(nf.length)); return ok; };
+  for (let k = 0; k < nf.length; k++) if (bothSafe(k, "D") && !(bothSafe(k, "H") && bothSafe(k, "A"))) nf[k].collude = true;
+}
 
 function compute(groups, matches) {
   const iran = groups.flatMap(g => g.teams).find(t => t.team === IRAN);
@@ -133,6 +150,7 @@ function compute(groups, matches) {
         lh: 1.35 * left * Math.min(1.8, Math.max(.55, Math.exp(0.18 * (sh - sa)))),
         la: 1.35 * left * Math.min(1.8, Math.max(.55, Math.exp(0.18 * (sa - sh)))) });
     }
+    markCollusion(ts, nf, 2);   // 2 = teams advancing directly per group (every modern WC format)
     return { n, bp: ts.map(t => t.pts), bgd: ts.map(t => t.gd), bgf: ts.map(t => t.gf),
       P: new Array(n), GD: new Array(n), GF: new Array(n), ord: ts.map((_, i) => i), nf };
   });
@@ -146,7 +164,10 @@ function compute(groups, matches) {
       const G = PG[gi], n = G.n, P = G.P, GD = G.GD, GF = G.GF;
       for (let i = 0; i < n; i++) { P[i] = G.bp[i]; GD[i] = G.bgd[i]; GF[i] = G.bgf[i]; }
       for (let k = 0; k < G.nf.length; k++) {
-        const m = G.nf[k], gh = m.hs + pois(m.lh), ga = m.as + pois(m.la);
+        const m = G.nf[k];
+        let gh, ga;
+        if (m.collude && Math.random() < COLLUDE_P) { gh = ga = Math.max(m.hs, m.as); }   // both prefer a draw
+        else { gh = m.hs + pois(m.lh); ga = m.as + pois(m.la); }
         GF[m.hi] += gh; GD[m.hi] += gh - ga; GF[m.ai] += ga; GD[m.ai] += ga - gh;
         if (gh > ga) P[m.hi] += 3; else if (gh < ga) P[m.ai] += 3; else { P[m.hi]++; P[m.ai]++; }
       }

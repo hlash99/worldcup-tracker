@@ -335,6 +335,26 @@ function rankTeams(ts){return ts.slice().sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.g
 function thirdOf(g){return rankTeams(g.teams)[2];}
 function betterRec(a,b){return (a.pts>b.pts)||(a.pts===b.pts&&a.gd>b.gd)||(a.pts===b.pts&&a.gd===b.gd&&a.gf>b.gf);}
 function aboveIran(t,ir){return betterRec(t,ir);}
+/* Collusion / "biscotto" detection (Disgrace of Gijón, 1982). A remaining match is flagged when a DRAW
+   sends BOTH teams through no matter what else happens, but a decisive result wouldn't guarantee both —
+   so the two sides share a vested interest in drawing. Neutral goal-sampling underrates such draws, so
+   the Monte-Carlo forces the convenient draw a fraction COLLUDE_P of the time, lifting its probability.
+   Points-based with current GD/GF as tiebreak; tractable shapes only (≤4 remaining matches in the group). */
+const COLLUDE_P=0.40;   // tunable: extra share of sims that resolve a flagged decider as a mutual draw
+function markCollusion(ts, nf, adv){
+  if(nf.length<1 || nf.length>4) return;
+  const n=ts.length, bp=ts.map(t=>t.pts), RES=["H","D","A"];
+  const ptsAfter=assign=>{ const P=bp.slice();
+    for(let j=0;j<nf.length;j++){const m=nf[j],r=assign[j]; if(r==="H")P[m.hi]+=3; else if(r==="A")P[m.ai]+=3; else {P[m.hi]++;P[m.ai]++;}}
+    return P; };
+  // "safely top-adv" = fewer than adv OTHER teams equal-or-beat it on points → guaranteed regardless of GD/GF tiebreaks
+  const safe=(P,i)=>{ let ge=0; for(let j=0;j<n;j++) if(j!==i && P[j]>=P[i]) ge++; return ge<adv; };
+  const bothSafe=(k,tr)=>{ const others=[]; for(let j=0;j<nf.length;j++) if(j!==k) others.push(j);
+    let ok=true; const rec=(i,a)=>{ if(!ok)return; if(i===others.length){a[k]=tr; const P=ptsAfter(a); if(!(safe(P,nf[k].hi)&&safe(P,nf[k].ai)))ok=false; return;}
+      for(const r of RES){a[others[i]]=r; rec(i+1,a);} }; rec(0,new Array(nf.length)); return ok; };
+  // a draw guarantees both through, but at least one decisive result doesn't → shared incentive to draw
+  for(let k=0;k<nf.length;k++) if(bothSafe(k,"D") && !(bothSafe(k,"H") && bothSafe(k,"A"))) nf[k].collude=true;
+}
 /* Format detection — adapts to whatever tournament is loaded rather than assuming the 48-team men's
    shape. From the number of groups it derives the knockout size (next power of two ≥ 2 per group) and
    how many "best (N+1)th-placed" wildcard slots exist:
@@ -401,6 +421,7 @@ function compute(groups, matches){
         lh:1.35*left*Math.min(1.8,Math.max(.55,Math.exp(0.18*(sh-sa)))),
         la:1.35*left*Math.min(1.8,Math.max(.55,Math.exp(0.18*(sa-sh))))});
     }
+    markCollusion(ts, nf, adv);   // flag any decider both sides are incentivised to draw (biscotto)
     return {gp,n,bp:ts.map(t=>t.pts),bgd:ts.map(t=>t.gd),bgf:ts.map(t=>t.gf),
             P:new Array(n),GD:new Array(n),GF:new Array(n),ord:ts.map((_,i)=>i),nf,
             iranIdx: idx[IRAN]==null?-1:idx[IRAN]};
@@ -458,7 +479,9 @@ function runMC(F, done){
         const G=PG[gi], n=G.n, P=G.P, GD=G.GD, GF=G.GF;
         for(let i=0;i<n;i++){P[i]=G.bp[i];GD[i]=G.bgd[i];GF[i]=G.bgf[i];}
         for(let k=0;k<G.nf.length;k++){const m=G.nf[k];
-          const gh=m.hs+pois(m.lh), ga=m.as+pois(m.la);
+          let gh,ga;
+          if(m.collude && Math.random()<COLLUDE_P){ gh=ga=Math.max(m.hs,m.as); }   // both prefer a draw → resolve level
+          else { gh=m.hs+pois(m.lh); ga=m.as+pois(m.la); }
           GF[m.hi]+=gh;GD[m.hi]+=gh-ga;GF[m.ai]+=ga;GD[m.ai]+=ga-gh;
           if(gh>ga)P[m.hi]+=3; else if(gh<ga)P[m.ai]+=3; else {P[m.hi]++;P[m.ai]++;}
         }
@@ -788,7 +811,9 @@ function render(R,pct,dist){
     let ideal="", favChip="";
     if(!decided && dec && (m.state==="in"||m.state==="pre")){
       const G=PGby[gp], k=G?G.nf.findIndex(x=>x.home===m.home&&x.away===m.away):-1;
-      if(k>=0){
+      if(k>=0 && G.nf[k].collude)   // both teams go through on a draw → the model lifts the draw's odds
+        ideal=`<span class="ideal" title="A draw sends BOTH these teams through, so they share an incentive to draw (a 'biscotto'). The model raises the chance of a draw here accordingly.">🤝 draw suits both</span>`;
+      if(k>=0 && !G.nf[k].collude){
         const s=idealOutcome(G,k,R.ip,R.igd,R.igf), f=flag(m.home), a=flag(m.away);
         const T={H:`${f}win`,D:"draw",A:`${a}win`,HD:`${f}win/draw`,DA:`${a}win/draw`,HA:"either win",HDA:"any result",
                  "":"no help here"}[s] ?? "any result";
