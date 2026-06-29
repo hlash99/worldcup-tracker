@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-29T03:56:25Z",
+  "updated": "2026-06-29T04:31:14Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,179 +10,158 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-06-29T03:56:25Z",
+  "server_updated": "2026-06-29T04:31:14Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
   "next_opponent": null,
   "next_kickoff": null,
   "next_confirmed": null,
-  "favorite": "Spain",
-  "favorite_pct": 20,
+  "favorite": "France",
+  "favorite_pct": 21,
   "iran_pct_raw": 0,
-  "favorite_pct_model": 20,
-  "favorite_pct_market": null,
+  "favorite_pct_model": 18,
+  "favorite_pct_market": 21,
   "contenders": [
     {
-      "team": "Spain",
+      "team": "France",
+      "pct": 21,
+      "pct_model": 18,
+      "pct_market": 21,
+      "record": "3-0-0"
+    },
+    {
+      "team": "Argentina",
       "pct": 20,
       "pct_model": 20,
-      "pct_market": null,
+      "pct_market": 19,
+      "record": "3-0-0"
+    },
+    {
+      "team": "Spain",
+      "pct": 11,
+      "pct_model": 11,
+      "pct_market": 9,
+      "record": "2-1-0"
+    },
+    {
+      "team": "England",
+      "pct": 9,
+      "pct_model": 7,
+      "pct_market": 9,
       "record": "2-1-0"
     },
     {
       "team": "Brazil",
-      "pct": 14,
-      "pct_model": 14,
-      "pct_market": null,
+      "pct": 7,
+      "pct_model": 8,
+      "pct_market": 5,
       "record": "2-1-0"
-    },
-    {
-      "team": "Germany",
-      "pct": 10,
-      "pct_model": 10,
-      "pct_market": null,
-      "record": "2-0-1"
     },
     {
       "team": "Netherlands",
-      "pct": 9,
-      "pct_model": 9,
-      "pct_market": null,
+      "pct": 5,
+      "pct_model": 5,
+      "pct_market": 5,
       "record": "2-1-0"
     },
     {
+      "team": "Portugal",
+      "pct": 5,
+      "pct_model": 4,
+      "pct_market": 5,
+      "record": "1-2-0"
+    },
+    {
+      "team": "Germany",
+      "pct": 4,
+      "pct_model": 4,
+      "pct_market": 3,
+      "record": "2-0-1"
+    },
+    {
       "team": "Mexico",
-      "pct": 8,
-      "pct_model": 8,
-      "pct_market": null,
+      "pct": 3,
+      "pct_model": 3,
+      "pct_market": 3,
       "record": "3-0-0"
     },
     {
-      "team": "Switzerland",
-      "pct": 5,
-      "pct_model": 5,
-      "pct_market": null,
+      "team": "Colombia",
+      "pct": 2,
+      "pct_model": 2,
+      "pct_market": 2,
       "record": "2-1-0"
     },
     {
       "team": "Belgium",
-      "pct": 5,
-      "pct_model": 5,
-      "pct_market": null,
+      "pct": 2,
+      "pct_model": 3,
+      "pct_market": 1,
       "record": "1-2-0"
     },
     {
-      "team": "Morocco",
-      "pct": 4,
-      "pct_model": 4,
-      "pct_market": null,
+      "team": "Switzerland",
+      "pct": 2,
+      "pct_model": 3,
+      "pct_market": 1,
       "record": "2-1-0"
     },
     {
-      "team": "United States",
-      "pct": 4,
-      "pct_model": 4,
-      "pct_market": null,
+      "team": "Norway",
+      "pct": 1,
+      "pct_model": 1,
+      "pct_market": 2,
       "record": "2-0-1"
     },
     {
-      "team": "Ivory Coast",
-      "pct": 2,
+      "team": "Morocco",
+      "pct": 1,
       "pct_model": 2,
-      "pct_market": null,
+      "pct_market": 1,
+      "record": "2-1-0"
+    },
+    {
+      "team": "Japan",
+      "pct": 1,
+      "pct_model": 1,
+      "pct_market": 1,
+      "record": "1-2-0"
+    },
+    {
+      "team": "United States",
+      "pct": 1,
+      "pct_model": 2,
+      "pct_market": 0,
       "record": "2-0-1"
     },
     {
       "team": "Canada",
-      "pct": 2,
-      "pct_model": 2,
-      "pct_market": null,
+      "pct": 1,
+      "pct_model": 1,
+      "pct_market": 0,
       "record": "2-1-1"
     },
     {
-      "team": "Japan",
-      "pct": 2,
-      "pct_model": 2,
-      "pct_market": null,
-      "record": "1-2-0"
-    },
-    {
-      "team": "Uruguay",
-      "pct": 2,
-      "pct_model": 2,
-      "pct_market": null,
-      "record": "0-2-1"
-    },
-    {
-      "team": "Sweden",
+      "team": "Congo DR",
       "pct": 1,
-      "pct_model": 1,
-      "pct_market": null,
+      "pct_model": 0,
+      "pct_market": 1,
       "record": "1-1-1"
     },
     {
-      "team": "Türkiye",
+      "team": "Croatia",
       "pct": 1,
       "pct_model": 1,
-      "pct_market": null,
+      "pct_market": 0,
+      "record": "2-0-1"
+    },
+    {
+      "team": "Senegal",
+      "pct": 1,
+      "pct_model": 1,
+      "pct_market": 0,
       "record": "1-0-2"
-    },
-    {
-      "team": "Iran",
-      "pct": 1,
-      "pct_model": 1,
-      "pct_market": null,
-      "record": "0-3-0"
-    },
-    {
-      "team": "Ecuador",
-      "pct": 1,
-      "pct_model": 1,
-      "pct_market": null,
-      "record": "1-1-1"
-    },
-    {
-      "team": "Australia",
-      "pct": 1,
-      "pct_model": 1,
-      "pct_market": null,
-      "record": "1-1-1"
-    },
-    {
-      "team": "Egypt",
-      "pct": 1,
-      "pct_model": 1,
-      "pct_market": null,
-      "record": "1-2-0"
-    },
-    {
-      "team": "Bosnia-Herzegovina",
-      "pct": 1,
-      "pct_model": 1,
-      "pct_market": null,
-      "record": "1-1-1"
-    },
-    {
-      "team": "Scotland",
-      "pct": 1,
-      "pct_model": 1,
-      "pct_market": null,
-      "record": "1-0-2"
-    },
-    {
-      "team": "South Korea",
-      "pct": 1,
-      "pct_model": 1,
-      "pct_market": null,
-      "record": "1-0-2"
-    },
-    {
-      "team": "Paraguay",
-      "pct": 1,
-      "pct_model": 1,
-      "pct_market": null,
-      "record": "1-1-1"
     }
   ],
   "league": "fifa.world",

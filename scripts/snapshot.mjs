@@ -246,24 +246,38 @@ async function teamRecords() {
   }
   return rec;
 }
+// Title odds: Monte-Carlo over the actual knockout BRACKET (not the group stage). The entry round is the
+// first knockout round (most matches — R32 in a 48-team WC, R16 in a 32-team one). Completed knockout
+// results are fixed, so teams already eliminated get 0% and only the live field carries probability.
 async function computeFavorite(groups) {
   let j; try { j = await getScoreboardJSON(`${SEASON}0601-${SEASON}0815`); } catch { return null; }
-  const ph = t => /third place|winner|group/i.test(t);
-  const pairs = findEvents(j)
-    .filter(e => e.competitions && e.competitions[0] && e.competitions[0].competitors)
-    .map(e => ({ date: e.date, teams: e.competitions[0].competitors.map(x => x.team.displayName) }))
-    .filter(e => e.teams.length === 2 && e.teams.every(t => !ph(t)))
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .map(e => e.teams.slice());
-  if (pairs.length < 16) return null;                 // R32 not fully set yet
-  const first = pairs.slice(0, 16);
+  const ph = t => /third place|winner|group|tbd|to be determined/i.test(t || "");
+  const KO = ["round-of-32", "round-of-16", "quarterfinals", "semifinals", "final"];
+  const evs = findEvents(j).map(e => {
+    const c = e.competitions && e.competitions[0]; if (!c || !c.competitors || c.competitors.length < 2) return null;
+    const cs = c.competitors, tp = (e.status && e.status.type) || {}, teams = cs.map(x => x.team && x.team.displayName);
+    let winner = null;
+    if (tp.state === "post") { const w = cs.find(x => x.winner === true);
+      if (w) winner = w.team.displayName; else { const a = +cs[0].score || 0, b = +cs[1].score || 0; if (a !== b) winner = (a > b ? cs[0] : cs[1]).team.displayName; } }
+    return { round: (e.season && e.season.slug) || "", date: e.date, teams, winner, post: tp.state === "post" };
+  }).filter(e => e && e.teams.length === 2 && e.teams.every(Boolean) && KO.includes(e.round));
+  if (!evs.length) return null;
+  const byRound = {}; for (const e of evs) (byRound[e.round] = byRound[e.round] || []).push(e);
+  let entry = null, best = 0; for (const r of KO) { const a = byRound[r] || []; if (a.length > best) { best = a.length; entry = r; } }
+  const entryMatches = (byRound[entry] || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+  if (entryMatches.length < 2 || (entryMatches.length & (entryMatches.length - 1)) !== 0) return null;   // need a full power-of-two bracket
+  if (entryMatches.some(e => e.teams.some(ph))) return null;                                              // bracket not fully set yet
+  // completed knockout results across every round, keyed by unordered team pair → actual winner
+  const key = (a, b) => [norm(a), norm(b)].sort().join("|");
+  const decided = {}; for (const e of evs) if (e.post && e.winner) decided[key(e.teams[0], e.teams[1])] = e.winner;
+  const first = entryMatches.map(e => e.teams.slice());
   const rt = teamRatings(groups), K = 0.055, rg = t => (rt[t] ?? 65);   // ratings on a 0–100 scale
   const pWin = (a, b) => 1 / (1 + Math.exp(-K * (rg(a) - rg(b))));
   const N = 20000, wins = {};
   for (let s = 0; s < N; s++) {
     let cur = first;
     for (;;) {
-      const w = cur.map(([a, b]) => (Math.random() < pWin(a, b) ? a : b));
+      const w = cur.map(([a, b]) => { const d = decided[key(a, b)]; return d ? d : (Math.random() < pWin(a, b) ? a : b); });
       if (w.length === 1) { wins[w[0]] = (wins[w[0]] || 0) + 1; break; }
       const nx = []; for (let i = 0; i < w.length; i += 2) nx.push([w[i], w[i + 1]]);
       cur = nx;
