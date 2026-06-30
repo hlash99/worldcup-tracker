@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-29T23:44:48Z",
+  "updated": "2026-06-30T01:52:17Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-06-29T23:44:48Z",
+  "server_updated": "2026-06-30T01:52:17Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -21,19 +21,19 @@
   "favorite_pct": 22,
   "iran_pct_raw": 0,
   "favorite_pct_model": 17,
-  "favorite_pct_market": 24,
+  "favorite_pct_market": 23,
   "contenders": [
     {
       "team": "France",
       "pct": 22,
       "pct_model": 17,
-      "pct_market": 24,
+      "pct_market": 23,
       "record": "3-0-0"
     },
     {
       "team": "Argentina",
       "pct": 20,
-      "pct_model": 20,
+      "pct_model": 19,
       "pct_market": 19,
       "record": "3-0-0"
     },
@@ -47,28 +47,28 @@
     {
       "team": "Brazil",
       "pct": 9,
-      "pct_model": 12,
+      "pct_model": 13,
       "pct_market": 6,
       "record": "3-1-0"
     },
     {
       "team": "England",
-      "pct": 8,
-      "pct_model": 7,
+      "pct": 9,
+      "pct_model": 8,
       "pct_market": 8,
       "record": "2-1-0"
     },
     {
       "team": "Netherlands",
       "pct": 6,
-      "pct_model": 6,
-      "pct_market": 6,
+      "pct_model": 5,
+      "pct_market": 5,
       "record": "2-1-0"
     },
     {
       "team": "Portugal",
       "pct": 6,
-      "pct_model": 5,
+      "pct_model": 4,
       "pct_market": 6,
       "record": "1-2-0"
     },
@@ -83,7 +83,7 @@
       "team": "Colombia",
       "pct": 3,
       "pct_model": 2,
-      "pct_market": 2,
+      "pct_market": 3,
       "record": "2-1-0"
     },
     {
@@ -97,13 +97,13 @@
       "team": "Morocco",
       "pct": 2,
       "pct_model": 2,
-      "pct_market": 1,
+      "pct_market": 2,
       "record": "2-1-0"
     },
     {
       "team": "Switzerland",
       "pct": 2,
-      "pct_model": 2,
+      "pct_model": 3,
       "pct_market": 1,
       "record": "2-1-0"
     },
@@ -143,11 +143,11 @@
       "record": "2-0-1"
     },
     {
-      "team": "Paraguay",
+      "team": "Senegal",
       "pct": 1,
       "pct_model": 1,
       "pct_market": 0,
-      "record": "1-2-1"
+      "record": "1-0-2"
     }
   ],
   "league": "fifa.world",
