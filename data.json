@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-03T18:44:35Z",
+  "updated": "2026-07-03T19:12:27Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-03T18:44:35Z",
+  "server_updated": "2026-07-03T19:12:27Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -18,14 +18,14 @@
   "next_kickoff": null,
   "next_confirmed": null,
   "favorite": "France",
-  "favorite_pct": 27,
+  "favorite_pct": 28,
   "iran_pct_raw": 0,
   "favorite_pct_model": 20,
   "favorite_pct_market": 30,
   "contenders": [
     {
       "team": "France",
-      "pct": 27,
+      "pct": 28,
       "pct_model": 20,
       "pct_market": 30,
       "record": "4-0-0"
@@ -34,26 +34,26 @@
       "team": "Argentina",
       "pct": 19,
       "pct_model": 18,
-      "pct_market": 17,
+      "pct_market": 18,
       "record": "3-0-0"
     },
     {
       "team": "Spain",
-      "pct": 13,
+      "pct": 12,
       "pct_model": 12,
-      "pct_market": 12,
+      "pct_market": 11,
       "record": "3-1-0"
     },
     {
       "team": "Brazil",
       "pct": 9,
-      "pct_model": 12,
+      "pct_model": 13,
       "pct_market": 6,
       "record": "3-1-0"
     },
     {
       "team": "England",
-      "pct": 8,
+      "pct": 7,
       "pct_model": 8,
       "pct_market": 7,
       "record": "3-1-0"
@@ -61,7 +61,7 @@
     {
       "team": "Portugal",
       "pct": 6,
-      "pct_model": 6,
+      "pct_model": 5,
       "pct_market": 6,
       "record": "2-2-0"
     },
@@ -138,7 +138,7 @@
       "draw_pct": 36,
       "kickoff": "2026-07-03T18:00Z",
       "state": "in",
-      "detail": "45'"
+      "detail": "50'"
     },
     {
       "home": "Argentina",
