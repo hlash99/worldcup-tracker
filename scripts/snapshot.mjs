@@ -189,6 +189,27 @@ function displayPct(R) {
   const x = p / 100; return 100 / (1 + Math.exp(-CAL_SHRINK * Math.log(x / (1 - x))));
 }
 
+// Today's slate for the dashboard card: each fixture with the favored team's implied
+// win % (90') from DraftKings' 3-way line carried in ESPN's scoreboard, plus state/score.
+const mlProb = ml => ml < 0 ? -ml / (-ml + 100) : 100 / (ml + 100);
+const todayKey = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" }).replace(/-/g, "");  // ESPN buckets by US-Eastern day
+function parseToday(j) {
+  return findEvents(j).map(e => { try {
+    const c = e.competitions && e.competitions[0]; if (!c || !c.competitors || c.competitors.length < 2) return null;
+    const tp = (e.status || {}).type || {};
+    const T = c.competitors.map(x => ({ n: x.team.displayName, ab: x.team.abbreviation || x.team.displayName.slice(0, 3).toUpperCase(), s: +x.score || 0 }));
+    const o = (c.odds && c.odds[0]) || {};
+    let fav = null, pct = null;
+    const m = /^([A-Z]{2,4})\s+([+-]\d+)/.exec(o.details || "");
+    if (m) { const t = T.find(x => x.ab === m[1]); if (t) { fav = t.n; pct = Math.round(mlProb(+m[2]) * 100); } }
+    const dml = o.drawOdds && o.drawOdds.moneyLine;
+    return { home: T[0].n, away: T[1].n, habbr: T[0].ab, aabbr: T[1].ab, hs: T[0].s, as: T[1].s,
+      fav, fav_pct: pct, draw_pct: dml != null ? Math.round(mlProb(+dml) * 100) : null,
+      kickoff: e.date, state: tp.state, detail: tp.shortDetail || "" };
+  } catch { return null; } }).filter(Boolean)
+    .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+}
+
 async function findNext() {
   try {
     const j = await getScoreboardJSON(`${SEASON}0601-${SEASON}0815`);
@@ -367,7 +388,9 @@ async function main() {
     : R.allFinal ? (R.pct >= 50 ? "advanced" : "eliminated") : "live";
   const shown = R.noIran ? null : Math.round(displayPct(R));   // calibrated, snaps to 100/0 when clinched/eliminated
   // Kalshi's winner market is men's-only (KXMENWORLDCUP); for the Women's WC fall back to model-only
-  const [favModel, market, recs] = await Promise.all([computeFavorite(groups), LEAGUE === "fifa.world" ? fetchWinnerMarket() : null, teamRecords()]);
+  const [favModel, market, recs, todayGames] = await Promise.all([
+    computeFavorite(groups), LEAGUE === "fifa.world" ? fetchWinnerMarket() : null, teamRecords(),
+    getScoreboardJSON(todayKey()).then(parseToday).catch(() => [])]);
   const fav = blendFavorite(favModel, market);   // WC winner: model blended with market (null until R32 set)
   if (fav && fav.contenders) for (const c of fav.contenders) { const r = recs[norm(c.team)]; c.record = r ? `${r.w}-${r.d}-${r.l}` : null; }   // attach each team's W-D-L
 
@@ -392,6 +415,7 @@ async function main() {
     favorite_pct_model: fav ? fav.favorite_pct_model : null,
     favorite_pct_market: fav ? fav.favorite_pct_market : null,
     contenders: fav ? fav.contenders : null,
+    today: todayGames,
     live: true,
     source: "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   };
