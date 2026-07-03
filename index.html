@@ -53,7 +53,7 @@
   .gcap{text-align:center;margin-top:-10px}
   .gcap .n{font-size:42px;font-weight:850;letter-spacing:-1.5px;line-height:1}
   .gcap .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
-  .verdict{flex:1;min-width:230px}
+  .verdict{flex:none;min-width:0}
   .verdict h3{margin:0 0 6px;font-size:18px}
   .verdict p{margin:0;color:var(--muted);font-size:14px}
   .pills{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
@@ -71,18 +71,21 @@
   .tag.live{color:var(--amber);border-color:var(--amber)}
   .tag.in{color:var(--green);border-color:var(--green)}
   .tag.out{color:var(--red);border-color:var(--red)}
-  /* mini win-favorite gauges — one per fixture today */
-  .mgrow{display:flex;gap:12px;flex-wrap:wrap}
-  .mg{flex:1 1 190px;min-width:175px;max-width:260px;text-align:center;padding:12px 10px 10px;
-      border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}
+  /* right column of the gauge card: verdict text + today's mini win-favorite meters */
+  .vcol{flex:1;min-width:230px;display:flex;flex-direction:column;justify-content:center}
+  .mghead{margin-top:15px;padding-top:13px;border-top:1px dashed var(--line);
+      font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:9px}
+  .mgrow{display:flex;gap:8px;flex-wrap:wrap}
+  .mg{flex:1 1 124px;min-width:114px;max-width:160px;text-align:center;padding:7px 5px 6px;
+      border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}
   .mg svg{display:block;margin:0 auto}
-  .mg .who{font-size:14px;font-weight:700;margin-top:2px}
-  .mg .who .p{font-size:16px}
-  .mg .vs{font-size:12px;color:var(--muted);margin-top:2px}
-  .mg .st2{font-size:12px;margin-top:6px}
+  .mg .who{font-size:12.5px;font-weight:700;margin-top:1px}
+  .mg .who .p{font-size:14px}
+  .mg .vs{font-size:10.5px;color:var(--muted);margin-top:1px}
+  .mg .st2{font-size:11px;margin-top:4px}
   .mg .st2 .liv{color:var(--red);font-weight:700}
-  .mg .draw{display:inline-block;font-size:10.5px;color:var(--muted);border:1px solid var(--line);
-      border-radius:12px;padding:1px 7px;margin-top:6px}
+  .mg .draw{display:inline-block;font-size:10px;color:var(--muted);border:1px solid var(--line);
+      border-radius:12px;padding:0 6px;margin-top:4px}
   .match{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line)}
   .match:last-child{border-bottom:0}
   .match .g{font-size:11px;color:var(--muted);width:64px;flex:none}
@@ -175,14 +178,15 @@
   <div id="blocks">
     <section class="block" data-block="gauge"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
       <div class="card">
-        <div class="gaugewrap"><div class="gcol"><div class="gauge" id="gauge"></div><div class="gcap" id="gcap"></div></div><div class="verdict" id="verdict"></div></div>
+        <div class="gaugewrap"><div class="gcol"><div class="gauge" id="gauge"></div><div class="gcap" id="gcap"></div></div>
+          <div class="vcol">
+            <div class="verdict" id="verdict"></div>
+            <div class="mghead" id="todayHead" style="display:none">Today's matches — who's favored</div>
+            <div class="mgrow" id="todayCard" style="display:none"></div>
+            <div class="legend" id="todayNote" style="display:none;margin-top:7px"></div>
+          </div>
+        </div>
       </div>
-    </section>
-
-    <section class="block" data-block="today" id="todayBlock" style="display:none"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
-      <h2 id="todayLabel">Today's matches — who's favored</h2>
-      <div class="card"><div class="mgrow" id="todayCard"></div>
-        <div class="legend" id="todayNote" style="margin-top:8px"></div></div>
     </section>
 
     <section class="block" data-block="needs"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
@@ -966,7 +970,7 @@ async function fetchToday(){
   renderToday();
 }
 function miniGauge(pct){
-  const W=150,H=88,cx=75,cy=80,R=58,r=40,N=22;
+  const W=104,H=63,cx=52,cy=57,R=41,r=28,N=22;
   const P=(rr,a)=>{const t=a*Math.PI/180;return `${(cx+rr*Math.cos(t)).toFixed(1)},${(cy-rr*Math.sin(t)).toFixed(1)}`;};
   let segs="";
   for(let i=0;i<N;i++){
@@ -986,11 +990,12 @@ function mainMeterTeam(){
   return "iran";
 }
 function renderToday(){
-  const blk=$("#todayBlock"), el=$("#todayCard"); if(!blk||!el) return;
+  const el=$("#todayCard"), head=$("#todayHead"), note=$("#todayNote"); if(!el) return;
+  const show=on=>{el.style.display=on?"":"none";head.style.display=on?"":"none";note.style.display=on?"":"none";};
   const main=mainMeterTeam();
   const list=TODAY.filter(e=>!e.teams.some(t=>t.n.toLowerCase()===main));
   const skipped=TODAY.find(e=>e.teams.some(t=>t.n.toLowerCase()===main));
-  if(!list.length){ blk.style.display="none"; return; }
+  if(!list.length){ show(false); return; }
   el.innerHTML=list.map(e=>{
     const [t1,t2]=e.teams, hasOdds=e.fav&&e.pct!=null;
     const other=hasOdds?e.teams.find(t=>t!==e.fav):null;
@@ -1012,9 +1017,9 @@ function renderToday(){
     </div>`;
   }).join("");
   const mainName=skipped?(SRV&&SRV.favorite&&mainMeterTeam()!=="iran"?SRV.favorite:"Iran"):null;
-  $("#todayNote").innerHTML=`Implied win probability (90 minutes) from DraftKings' pre-match line, via ESPN.`
-    +(mainName?` ${flag(mainName)}${esc(mainName)} also play today — they're covered by the main meter above.`:"");
-  blk.style.display="";
+  note.innerHTML=`Implied win probability (90 minutes) from DraftKings' pre-match line, via ESPN.`
+    +(mainName?` ${flag(mainName)}${esc(mainName)} also play today — see the main meter.`:"");
+  show(true);
 }
 function renderNext(){
   const el=$("#nextCard"); if(!el) return;
@@ -1165,9 +1170,7 @@ function saveBlocks(){try{localStorage.setItem("iranBlocks",JSON.stringify([...$
 function applyBlocks(){let o;try{o=JSON.parse(localStorage.getItem("iranBlocks")||"[]");}catch(e){return;}if(!o.length)return;
   const c=$("#blocks"),pos=new Map(o.map((k,i)=>[k,i]));
   [...c.querySelectorAll(".block")].sort((a,b)=>(pos.has(a.dataset.block)?pos.get(a.dataset.block):1e6)-(pos.has(b.dataset.block)?pos.get(b.dataset.block):1e6)).forEach(b=>c.appendChild(b));
-  // a block added after the user saved their order (e.g. "today") would land at the
-  // bottom — slot it into its natural home just under the gauge instead
-  if(!o.includes("today")){const g=c.querySelector('[data-block="gauge"]'),t=c.querySelector('[data-block="today"]');if(g&&t)g.after(t);}}
+}
 function resetBlocks(){localStorage.removeItem("iranBlocks");location.reload();}
 function blockAfter(c,y){let best=null,bestOff=-Infinity;
   for(const el of c.querySelectorAll(".block:not(.dragging)")){const b=el.getBoundingClientRect(),off=y-(b.top+b.height/2);
