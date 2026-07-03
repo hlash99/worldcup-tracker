@@ -71,6 +71,18 @@
   .tag.live{color:var(--amber);border-color:var(--amber)}
   .tag.in{color:var(--green);border-color:var(--green)}
   .tag.out{color:var(--red);border-color:var(--red)}
+  /* mini win-favorite gauges — one per fixture today */
+  .mgrow{display:flex;gap:12px;flex-wrap:wrap}
+  .mg{flex:1 1 190px;min-width:175px;max-width:260px;text-align:center;padding:12px 10px 10px;
+      border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}
+  .mg svg{display:block;margin:0 auto}
+  .mg .who{font-size:14px;font-weight:700;margin-top:2px}
+  .mg .who .p{font-size:16px}
+  .mg .vs{font-size:12px;color:var(--muted);margin-top:2px}
+  .mg .st2{font-size:12px;margin-top:6px}
+  .mg .st2 .liv{color:var(--red);font-weight:700}
+  .mg .draw{display:inline-block;font-size:10.5px;color:var(--muted);border:1px solid var(--line);
+      border-radius:12px;padding:1px 7px;margin-top:6px}
   .match{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line)}
   .match:last-child{border-bottom:0}
   .match .g{font-size:11px;color:var(--muted);width:64px;flex:none}
@@ -165,6 +177,12 @@
       <div class="card">
         <div class="gaugewrap"><div class="gcol"><div class="gauge" id="gauge"></div><div class="gcap" id="gcap"></div></div><div class="verdict" id="verdict"></div></div>
       </div>
+    </section>
+
+    <section class="block" data-block="today" id="todayBlock" style="display:none"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
+      <h2 id="todayLabel">Today's matches — who's favored</h2>
+      <div class="card"><div class="mgrow" id="todayCard"></div>
+        <div class="legend" id="todayNote" style="margin-top:8px"></div></div>
     </section>
 
     <section class="block" data-block="needs"><span class="grip" draggable="true" title="Drag to reorder">⠿</span>
@@ -917,6 +935,87 @@ async function fetchNext(){
   renderBracket();
   renderNext();
 }
+
+/* ── Today's fixtures: mini "who's favored" meters ──
+   ESPN's scoreboard carries DraftKings' 3-way line as e.g. "ARG -700" (the
+   favorite) plus the draw price; the meter shows the favorite's implied win
+   probability from that line. A fixture is skipped when it involves the team
+   the MAIN meter already covers (Iran while they're alive; the title favorite
+   once the page has pivoted) so the two meters never overlap. */
+let TODAY=[];
+const mlProb=ml=>ml<0 ? -ml/(-ml+100) : 100/(ml+100);
+const todayKey=()=>new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"}).replace(/-/g,"");  // ESPN buckets fixtures by US-Eastern day
+function parseToday(j){
+  return findEvents(j).map(e=>{ try{
+    const c=e.competitions&&e.competitions[0]; if(!c||!c.competitors) return null;
+    const st=(e.status||{}).type||{};
+    const T=c.competitors.map(x=>({n:x.team.displayName, ab:x.team.abbreviation||x.team.displayName.slice(0,3).toUpperCase(),
+      s:x.score, w:x.winner===true}));
+    const o=(c.odds&&c.odds[0])||{};
+    let fav=null, pct=null;
+    const m=/^([A-Z]{2,4})\s+([+-]\d+)/.exec(o.details||"");
+    if(m){ const t=T.find(x=>x.ab===m[1]); if(t){ fav=t; pct=Math.round(mlProb(+m[2])*100); } }
+    const dml=o.drawOdds&&o.drawOdds.moneyLine;
+    return {teams:T, fav, pct, draw:dml!=null?Math.round(mlProb(+dml)*100):null,
+      date:e.date, state:st.state, detail:st.shortDetail||st.detail||"",
+      link:((e.links&&(e.links.find(l=>l.rel&&l.rel.includes("summary"))||e.links[0]))||{}).href||null};
+  }catch(_){ return null; } }).filter(Boolean);
+}
+async function fetchToday(){
+  try{ TODAY=parseToday(await getScoreboardJSON(todayKey())); }catch(_){}
+  renderToday();
+}
+function miniGauge(pct){
+  const W=150,H=88,cx=75,cy=80,R=58,r=40,N=22;
+  const P=(rr,a)=>{const t=a*Math.PI/180;return `${(cx+rr*Math.cos(t)).toFixed(1)},${(cy-rr*Math.sin(t)).toFixed(1)}`;};
+  let segs="";
+  for(let i=0;i<N;i++){
+    const a0=180-i*180/N, a1=180-(i+1)*180/N;
+    const lit=(i+0.5)/N*100<=pct;                      // fan fills up to the needle
+    segs+=`<path d="M${P(R,a0)} A${R},${R} 0 0 1 ${P(R,a1)} L${P(r,a1)} A${r},${r} 0 0 0 ${P(r,a0)} Z"
+      fill="hsl(${Math.round(i*120/(N-1))},62%,55%)" opacity="${lit?".85":".16"}"/>`;
+  }
+  const ang=180-(pct/100)*180, t=ang*Math.PI/180;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${segs}
+    <line x1="${cx}" y1="${cy}" x2="${(cx+(R-3)*Math.cos(t)).toFixed(1)}" y2="${(cy-(R-3)*Math.sin(t)).toFixed(1)}"
+      stroke="var(--ink)" stroke-width="3" stroke-linecap="round" opacity=".92"/>
+    <circle cx="${cx}" cy="${cy}" r="4.5" fill="var(--ink)"/></svg>`;
+}
+function mainMeterTeam(){
+  if(SRV && SRV.favorite && (iranState==="out" || SRV.team_in_field===false)) return SRV.favorite.toLowerCase();
+  return "iran";
+}
+function renderToday(){
+  const blk=$("#todayBlock"), el=$("#todayCard"); if(!blk||!el) return;
+  const main=mainMeterTeam();
+  const list=TODAY.filter(e=>!e.teams.some(t=>t.n.toLowerCase()===main));
+  const skipped=TODAY.find(e=>e.teams.some(t=>t.n.toLowerCase()===main));
+  if(!list.length){ blk.style.display="none"; return; }
+  el.innerHTML=list.map(e=>{
+    const [t1,t2]=e.teams, hasOdds=e.fav&&e.pct!=null;
+    const other=hasOdds?e.teams.find(t=>t!==e.fav):null;
+    const col=hasOdds?(e.pct>=55?"var(--green)":e.pct<=45?"var(--red)":"var(--ink)"):"var(--muted)";
+    const ko=new Date(e.date).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
+    const mark=e.state==="post"&&e.fav ? (e.fav.w?" ✓":(e.teams.some(t=>t.w)?" ✗":"")) : "";
+    const status=e.state==="in"?A(WATCH,`<span class="liv">▶ ${esc(t1.s)}–${esc(t2.s)} · ${esc(e.detail)}</span>`)
+      :e.state==="post"?A(e.link,`FT ${esc(t1.s)}–${esc(t2.s)}${mark}`)
+      :A(e.link,"kickoff "+esc(ko));
+    return `<div class="mg">
+      ${hasOdds?miniGauge(e.pct)
+        :`<div style="height:88px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px">odds TBD</div>`}
+      ${hasOdds?`<div class="who" style="color:${col}">${flag(e.fav.n)}${esc(e.fav.ab)} <span class="p">${e.pct}%</span></div>
+        <div class="vs">favored vs ${flag(other.n)}${esc(other.n)}</div>`
+        :`<div class="who">${flag(t1.n)}${esc(t1.ab)} <span style="color:var(--muted)">v</span> ${flag(t2.n)}${esc(t2.ab)}</div>
+        <div class="vs">no line yet</div>`}
+      <div class="st2">${status}</div>
+      ${e.draw!=null?`<span class="draw">draw ${e.draw}%</span>`:""}
+    </div>`;
+  }).join("");
+  const mainName=skipped?(SRV&&SRV.favorite&&mainMeterTeam()!=="iran"?SRV.favorite:"Iran"):null;
+  $("#todayNote").innerHTML=`Implied win probability (90 minutes) from DraftKings' pre-match line, via ESPN.`
+    +(mainName?` ${flag(mainName)}${esc(mainName)} also play today — they're covered by the main meter above.`:"");
+  blk.style.display="";
+}
 function renderNext(){
   const el=$("#nextCard"); if(!el) return;
   // Iran out → the "next Iran match" is moot, so this block tracks the title favorite's next
@@ -1034,7 +1133,7 @@ async function refresh(){
 }
 /* adaptive polling: while any game is live, refresh every 15s so the meter tracks goals; otherwise every 60s */
 async function refreshLoop(){ try{ await refresh(); }catch(e){} setTimeout(refreshLoop, gamesLive?15000:60000); }
-async function koLoop(){ try{ await fetchNext(); }catch(e){} setTimeout(koLoop, gamesLive?20000:60000); }   // bracket/next-up scores keep pace too
+async function koLoop(){ try{ await fetchNext(); }catch(e){} try{ await fetchToday(); }catch(e){} setTimeout(koLoop, gamesLive?20000:60000); }   // bracket/next-up/today's meters keep pace too
 /* server snapshot (favorite + market-blended title odds, computed in the Action) — used when Iran are out */
 async function fetchServer(){ try{ const d=await fetch("data.json?_="+Date.now()).then(r=>r.json()); if(d&&typeof d==="object"){ SRV=d; if(iranState==="out") refresh(); } }catch(e){} }
 /* boot: resolve which World Cup is live/next (men's or women's, any season) before polling */
@@ -1059,13 +1158,16 @@ window.addEventListener("resize",()=>{clearTimeout(window._bf);window._bf=setTim
 let wakeLock=null;
 async function keepAwake(){try{if("wakeLock" in navigator && !document.hidden) wakeLock=await navigator.wakeLock.request("screen");}catch(e){}}
 keepAwake();
-document.addEventListener("visibilitychange",()=>{if(!document.hidden){keepAwake();refresh();fetchNext();}});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){keepAwake();refresh();fetchNext();fetchToday();}});
 
 /* ── drag-to-reorder the page sections (persisted per browser) ── */
 function saveBlocks(){try{localStorage.setItem("iranBlocks",JSON.stringify([...$("#blocks").querySelectorAll(".block")].map(b=>b.dataset.block)));}catch(e){}}
 function applyBlocks(){let o;try{o=JSON.parse(localStorage.getItem("iranBlocks")||"[]");}catch(e){return;}if(!o.length)return;
   const c=$("#blocks"),pos=new Map(o.map((k,i)=>[k,i]));
-  [...c.querySelectorAll(".block")].sort((a,b)=>(pos.has(a.dataset.block)?pos.get(a.dataset.block):1e6)-(pos.has(b.dataset.block)?pos.get(b.dataset.block):1e6)).forEach(b=>c.appendChild(b));}
+  [...c.querySelectorAll(".block")].sort((a,b)=>(pos.has(a.dataset.block)?pos.get(a.dataset.block):1e6)-(pos.has(b.dataset.block)?pos.get(b.dataset.block):1e6)).forEach(b=>c.appendChild(b));
+  // a block added after the user saved their order (e.g. "today") would land at the
+  // bottom — slot it into its natural home just under the gauge instead
+  if(!o.includes("today")){const g=c.querySelector('[data-block="gauge"]'),t=c.querySelector('[data-block="today"]');if(g&&t)g.after(t);}}
 function resetBlocks(){localStorage.removeItem("iranBlocks");location.reload();}
 function blockAfter(c,y){let best=null,bestOff=-Infinity;
   for(const el of c.querySelectorAll(".block:not(.dragging)")){const b=el.getBoundingClientRect(),off=y-(b.top+b.height/2);
