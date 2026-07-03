@@ -419,6 +419,14 @@ async function main() {
     live: true,
     source: "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   };
+  // Skip the write (→ no commit, no Pages deploy) when nothing material changed —
+  // only the timestamps differ between quiet runs, and committing every run makes
+  // GitHub race concurrent deploys ("Deployment failed, try again later" emails).
+  const stable = o => { const c = { ...o }; delete c.updated; delete c.server_updated; return JSON.stringify(c); };
+  if (stable(out) === stable(prev)) {
+    console.log("no material change since last snapshot — skipping write/commit.");
+    return;
+  }
   writeFileSync(join(ROOT, "data.json"), JSON.stringify(out, null, 2) + "\n");
   console.log(`${LEAGUE} ${SEASON} · ${IRAN} ${R.noIran ? "not in field" : R.pct.toFixed(1) + "% (pos " + R.iranPos + ")"} · status=${status}`
     + (next ? ` · next: ${next.opponent}${next.confirmed ? " (confirmed)" : " (projected)"}` : "")

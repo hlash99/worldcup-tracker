@@ -1,6 +1,6 @@
-# iran-r32-tracker
+# worldcup-tracker
 
-Live at **https://hlash99.github.io/iran-r32-tracker/** · linked from the
+Live at **https://hlash99.github.io/worldcup-tracker/** · linked from the
 [hlash99 dashboard](https://hlash99.github.io/).
 
 A real-time probability that **Iran** advances to the 2026 World Cup Round of 32
