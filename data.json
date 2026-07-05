@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-05T22:43:04Z",
+  "updated": "2026-07-05T23:47:46Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-05T22:43:04Z",
+  "server_updated": "2026-07-05T23:47:46Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -18,23 +18,23 @@
   "next_kickoff": null,
   "next_confirmed": null,
   "favorite": "France",
-  "favorite_pct": 29,
+  "favorite_pct": 28,
   "iran_pct_raw": 0,
   "favorite_pct_model": 20,
-  "favorite_pct_market": 32,
+  "favorite_pct_market": 31,
   "contenders": [
     {
       "team": "France",
-      "pct": 29,
+      "pct": 28,
       "pct_model": 20,
-      "pct_market": 32,
+      "pct_market": 31,
       "record": "5-0-0"
     },
     {
       "team": "Argentina",
       "pct": 19,
       "pct_model": 20,
-      "pct_market": 16,
+      "pct_market": 17,
       "record": "4-0-0"
     },
     {
@@ -55,15 +55,15 @@
       "team": "Portugal",
       "pct": 6,
       "pct_model": 5,
-      "pct_market": 5,
+      "pct_market": 6,
       "record": "2-2-0"
     },
     {
       "team": "Brazil",
       "pct": 5,
-      "pct_model": 12,
+      "pct_model": 11,
       "pct_market": 0,
-      "record": "3-1-0"
+      "record": "3-1-1"
     },
     {
       "team": "Mexico",
@@ -73,18 +73,18 @@
       "record": "4-0-0"
     },
     {
+      "team": "Norway",
+      "pct": 4,
+      "pct_model": 2,
+      "pct_market": 5,
+      "record": "4-0-1"
+    },
+    {
       "team": "Morocco",
       "pct": 4,
       "pct_model": 6,
       "pct_market": 3,
       "record": "3-2-0"
-    },
-    {
-      "team": "Norway",
-      "pct": 4,
-      "pct_model": 1,
-      "pct_market": 5,
-      "record": "3-0-1"
     },
     {
       "team": "Colombia",
@@ -150,7 +150,7 @@
       "fav": "England",
       "fav_pct": 39,
       "draw_pct": 33,
-      "kickoff": "2026-07-06T00:00Z",
+      "kickoff": "2026-07-06T01:00Z",
       "state": "pre",
       "detail": "Scheduled"
     }
