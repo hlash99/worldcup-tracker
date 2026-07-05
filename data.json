@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-05T07:46:27Z",
+  "updated": "2026-07-05T09:58:39Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-05T07:46:27Z",
+  "server_updated": "2026-07-05T09:58:39Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -33,8 +33,8 @@
     {
       "team": "Argentina",
       "pct": 18,
-      "pct_model": 19,
-      "pct_market": 16,
+      "pct_model": 20,
+      "pct_market": 15,
       "record": "4-0-0"
     },
     {
@@ -69,20 +69,20 @@
       "team": "Mexico",
       "pct": 4,
       "pct_model": 3,
-      "pct_market": 4,
+      "pct_market": 5,
       "record": "4-0-0"
     },
     {
       "team": "Morocco",
       "pct": 4,
-      "pct_model": 5,
-      "pct_market": 2,
+      "pct_model": 6,
+      "pct_market": 3,
       "record": "3-2-0"
     },
     {
       "team": "Colombia",
       "pct": 3,
-      "pct_model": 3,
+      "pct_model": 2,
       "pct_market": 3,
       "record": "3-1-0"
     },
@@ -102,9 +102,9 @@
     },
     {
       "team": "Norway",
-      "pct": 1,
+      "pct": 2,
       "pct_model": 1,
-      "pct_market": 1,
+      "pct_market": 2,
       "record": "3-0-1"
     },
     {
@@ -135,7 +135,7 @@
       "as": 0,
       "fav": "Brazil",
       "fav_pct": 56,
-      "draw_pct": 27,
+      "draw_pct": 26,
       "kickoff": "2026-07-05T20:00Z",
       "state": "pre",
       "detail": "Scheduled"
@@ -148,8 +148,8 @@
       "hs": 0,
       "as": 0,
       "fav": "England",
-      "fav_pct": 42,
-      "draw_pct": 31,
+      "fav_pct": 41,
+      "draw_pct": 32,
       "kickoff": "2026-07-06T00:00Z",
       "state": "pre",
       "detail": "Scheduled"
