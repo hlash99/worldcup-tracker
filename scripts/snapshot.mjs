@@ -192,19 +192,34 @@ function displayPct(R) {
 // Today's slate for the dashboard card: each fixture with the favored team's implied
 // win % (90') from DraftKings' 3-way line carried in ESPN's scoreboard, plus state/score.
 const mlProb = ml => ml < 0 ? -ml / (-ml + 100) : 100 / (ml + 100);
+const OVERROUND = 1.06;   // 3-way book margin, to back out the opponent's line (see index.html)
 const todayKey = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" }).replace(/-/g, "");  // ESPN buckets by US-Eastern day
 function parseToday(j) {
   return findEvents(j).map(e => { try {
     const c = e.competitions && e.competitions[0]; if (!c || !c.competitors || c.competitors.length < 2) return null;
     const tp = (e.status || {}).type || {};
+    const ko = /round-of|quarter|semi|final/i.test((e.season && e.season.slug) || "");
     const T = c.competitors.map(x => ({ n: x.team.displayName, ab: x.team.abbreviation || x.team.displayName.slice(0, 3).toUpperCase(), s: +x.score || 0 }));
     const o = (c.odds && c.odds[0]) || {};
-    let fav = null, pct = null;
     const m = /^([A-Z]{2,4})\s+([+-]\d+)/.exec(o.details || "");
-    if (m) { const t = T.find(x => x.ab === m[1]); if (t) { fav = t.n; pct = Math.round(mlProb(+m[2]) * 100); } }
     const dml = o.drawOdds && o.drawOdds.moneyLine;
+    let fav = null, pct = null, opp_pct = null, draw_pct = null;
+    if (m) {
+      const dTeam = T.find(x => x.ab === m[1]), dp = mlProb(+m[2]), drp = dml != null ? mlProb(+dml) : null;
+      if (dTeam && ko && drp != null) {
+        // knockout: no draw — chance to WIN THE TIE (advance); the draw resolves via
+        // extra time / penalties in proportion to strength, so it cancels out.
+        const adv = Math.min(0.97, Math.max(0.03, dp / (OVERROUND - drp)));
+        const other = T.find(x => x !== dTeam);
+        if (adv >= 0.5) { fav = dTeam.n; pct = Math.round(adv * 100); }
+        else { fav = other.n; pct = Math.round((1 - adv) * 100); }
+        opp_pct = 100 - pct;
+      } else if (dTeam) {                               // group stage: keep the 3-way 90' view
+        fav = dTeam.n; pct = Math.round(dp * 100); draw_pct = drp != null ? Math.round(drp * 100) : null;
+      }
+    }
     return { home: T[0].n, away: T[1].n, habbr: T[0].ab, aabbr: T[1].ab, hs: T[0].s, as: T[1].s,
-      fav, fav_pct: pct, draw_pct: dml != null ? Math.round(mlProb(+dml) * 100) : null,
+      ko, fav, fav_pct: pct, opp_pct, draw_pct,
       kickoff: e.date, state: tp.state, detail: tp.shortDetail || "" };
   } catch { return null; } }).filter(Boolean)
     .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-06T21:03:03Z",
+  "updated": "2026-07-06T21:49:55Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-06T21:03:03Z",
+  "server_updated": "2026-07-06T21:49:55Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -21,28 +21,28 @@
   "favorite_pct": 28,
   "iran_pct_raw": 0,
   "favorite_pct_model": 19,
-  "favorite_pct_market": 30,
+  "favorite_pct_market": 31,
   "contenders": [
     {
       "team": "France",
       "pct": 28,
       "pct_model": 19,
-      "pct_market": 30,
+      "pct_market": 31,
       "record": "5-0-0"
     },
     {
-      "team": "Argentina",
+      "team": "Spain",
       "pct": 19,
       "pct_model": 20,
-      "pct_market": 16,
-      "record": "4-0-0"
+      "pct_market": 17,
+      "record": "4-1-0"
     },
     {
-      "team": "Spain",
-      "pct": 16,
-      "pct_model": 12,
-      "pct_market": 17,
-      "record": "3-1-0"
+      "team": "Argentina",
+      "pct": 18,
+      "pct_model": 19,
+      "pct_market": 16,
+      "record": "4-0-0"
     },
     {
       "team": "England",
@@ -53,8 +53,8 @@
     },
     {
       "team": "Brazil",
-      "pct": 5,
-      "pct_model": 11,
+      "pct": 4,
+      "pct_model": 10,
       "pct_market": 0,
       "record": "3-1-1"
     },
@@ -68,7 +68,7 @@
     {
       "team": "Morocco",
       "pct": 4,
-      "pct_model": 6,
+      "pct_model": 5,
       "pct_market": 3,
       "record": "3-2-0"
     },
@@ -78,13 +78,6 @@
       "pct_model": 2,
       "pct_market": 3,
       "record": "3-1-0"
-    },
-    {
-      "team": "Portugal",
-      "pct": 2,
-      "pct_model": 5,
-      "pct_market": 0,
-      "record": "2-2-0"
     },
     {
       "team": "Belgium",
@@ -126,8 +119,10 @@
       "aabbr": "ESP",
       "hs": 0,
       "as": 1,
+      "ko": true,
       "fav": null,
       "fav_pct": null,
+      "opp_pct": null,
       "draw_pct": null,
       "kickoff": "2026-07-06T19:00Z",
       "state": "post",
@@ -140,9 +135,11 @@
       "aabbr": "BEL",
       "hs": 0,
       "as": 0,
+      "ko": true,
       "fav": "United States",
-      "fav_pct": 39,
-      "draw_pct": 29,
+      "fav_pct": 51,
+      "opp_pct": 49,
+      "draw_pct": null,
       "kickoff": "2026-07-07T00:00Z",
       "state": "pre",
       "detail": "Scheduled"

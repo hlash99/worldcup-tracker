@@ -949,19 +949,35 @@ async function fetchNext(){
    once the page has pivoted) so the two meters never overlap. */
 let TODAY=[];
 const mlProb=ml=>ml<0 ? -ml/(-ml+100) : 100/(ml+100);
+const OVERROUND=1.06;   // typical 3-way soccer book margin; used to back out the opponent's line
 const todayKey=()=>new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"}).replace(/-/g,"");  // ESPN buckets fixtures by US-Eastern day
 function parseToday(j){
   return findEvents(j).map(e=>{ try{
     const c=e.competitions&&e.competitions[0]; if(!c||!c.competitors) return null;
     const st=(e.status||{}).type||{};
+    const ko=/round-of|quarter|semi|final/i.test((e.season&&e.season.slug)||"");
     const T=c.competitors.map(x=>({n:x.team.displayName, ab:x.team.abbreviation||x.team.displayName.slice(0,3).toUpperCase(),
       s:x.score, w:x.winner===true}));
     const o=(c.odds&&c.odds[0])||{};
-    let fav=null, pct=null;
-    const m=/^([A-Z]{2,4})\s+([+-]\d+)/.exec(o.details||"");
-    if(m){ const t=T.find(x=>x.ab===m[1]); if(t){ fav=t; pct=Math.round(mlProb(+m[2])*100); } }
+    const m=/^([A-Z]{2,4})\s+([+-]\d+)/.exec(o.details||"");   // the team ESPN lists + its 90' line
     const dml=o.drawOdds&&o.drawOdds.moneyLine;
-    return {teams:T, fav, pct, draw:dml!=null?Math.round(mlProb(+dml)*100):null,
+    let fav=null, pct=null, oppPct=null, draw=null;
+    if(m){
+      const dTeam=T.find(x=>x.ab===m[1]), dp=mlProb(+m[2]), drp=dml!=null?mlProb(+dml):null;
+      if(dTeam && ko && drp!=null){
+        // Knockout: no draw — the meter shows who WINS THE TIE (advances). A draw
+        // goes to extra time / penalties, which resolve ~in proportion to strength,
+        // so P(advance) = win90 / (both teams' win90); the draw mass cancels out.
+        let adv=Math.min(0.97, Math.max(0.03, dp/(OVERROUND-drp)));   // opponent win90 = OVERROUND-dp-drp
+        const other=T.find(x=>x!==dTeam);
+        if(adv>=0.5){ fav=dTeam; pct=Math.round(adv*100); } else { fav=other; pct=Math.round((1-adv)*100); }
+        oppPct=100-pct;
+      } else if(dTeam){
+        // Group stage: a draw is a real result, so keep the 3-way 90-minute view.
+        fav=dTeam; pct=Math.round(dp*100); draw=drp!=null?Math.round(drp*100):null;
+      }
+    }
+    return {teams:T, fav, pct, oppPct, draw, ko,
       date:e.date, state:st.state, detail:st.shortDetail||st.detail||"",
       link:((e.links&&(e.links.find(l=>l.rel&&l.rel.includes("summary"))||e.links[0]))||{}).href||null};
   }catch(_){ return null; } }).filter(Boolean);
@@ -1010,15 +1026,21 @@ function renderToday(){
       ${hasOdds?miniGauge(e.pct)
         :`<div style="height:88px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px">odds TBD</div>`}
       ${hasOdds?`<div class="who" style="color:${col}">${flag(e.fav.n)}${esc(e.fav.ab)} <span class="p">${e.pct}%</span></div>
-        <div class="vs">favored vs ${flag(other.n)}${esc(other.n)}</div>`
+        <div class="vs">${e.ko&&e.oppPct!=null
+          ? `to win · ${flag(other.n)}${esc(other.ab)} ${e.oppPct}%`
+          : `favored vs ${flag(other.n)}${esc(other.n)}`}</div>`
         :`<div class="who">${flag(t1.n)}${esc(t1.ab)} <span style="color:var(--muted)">v</span> ${flag(t2.n)}${esc(t2.ab)}</div>
         <div class="vs">no line yet</div>`}
       <div class="st2">${status}</div>
-      ${e.draw!=null?`<span class="draw">draw ${e.draw}%</span>`:""}
+      ${(!e.ko && e.draw!=null)?`<span class="draw">draw ${e.draw}%</span>`:""}
     </div>`;
   }).join("");
   const mainName=skipped?(SRV&&SRV.favorite&&mainMeterTeam()!=="iran"?SRV.favorite:"Iran"):null;
-  note.innerHTML=`Implied win probability (90 minutes) from DraftKings' pre-match line, via ESPN.`
+  const anyKO=list.some(e=>e.ko&&e.oppPct!=null);
+  note.innerHTML=(anyKO
+      ? `Chance to <b>win the tie</b> (advance) — a draw goes to extra time / penalties. `
+      : `Implied win probability (90 minutes). `)
+    +`From the pre-match betting line via ESPN.`
     +(mainName?` ${flag(mainName)}${esc(mainName)} also play today — see the main meter.`:"");
   show(true);
 }
