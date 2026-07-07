@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-07T13:54:42Z",
+  "updated": "2026-07-07T16:28:10Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-07T13:54:42Z",
+  "server_updated": "2026-07-07T16:28:10Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -33,23 +33,30 @@
     {
       "team": "Spain",
       "pct": 19,
-      "pct_model": 19,
+      "pct_model": 20,
       "pct_market": 18,
       "record": "4-1-0"
     },
     {
       "team": "Argentina",
-      "pct": 18,
+      "pct": 16,
       "pct_model": 19,
-      "pct_market": 17,
+      "pct_market": 12,
       "record": "4-0-0"
     },
     {
       "team": "England",
       "pct": 14,
       "pct_model": 13,
-      "pct_market": 14,
+      "pct_market": 15,
       "record": "4-1-0"
+    },
+    {
+      "team": "Norway",
+      "pct": 5,
+      "pct_model": 2,
+      "pct_market": 6,
+      "record": "4-0-1"
     },
     {
       "team": "Brazil",
@@ -57,13 +64,6 @@
       "pct_model": 10,
       "pct_market": 0,
       "record": "3-1-1"
-    },
-    {
-      "team": "Norway",
-      "pct": 4,
-      "pct_model": 2,
-      "pct_market": 5,
-      "record": "4-0-1"
     },
     {
       "team": "Morocco",
@@ -81,9 +81,9 @@
     },
     {
       "team": "Colombia",
-      "pct": 3,
+      "pct": 4,
       "pct_model": 2,
-      "pct_market": 3,
+      "pct_market": 4,
       "record": "3-1-0"
     },
     {
@@ -97,13 +97,13 @@
       "team": "Egypt",
       "pct": 1,
       "pct_model": 1,
-      "pct_market": 0,
+      "pct_market": 1,
       "record": "1-3-0"
     },
     {
       "team": "Canada",
       "pct": 0,
-      "pct_model": 0,
+      "pct_model": 1,
       "pct_market": 0,
       "record": "2-1-2"
     }
@@ -118,15 +118,15 @@
       "habbr": "ARG",
       "aabbr": "EGY",
       "hs": 0,
-      "as": 0,
+      "as": 1,
       "ko": true,
       "fav": "Argentina",
       "fav_pct": 88,
       "opp_pct": 12,
       "draw_pct": null,
       "kickoff": "2026-07-07T16:00Z",
-      "state": "pre",
-      "detail": "Scheduled"
+      "state": "in",
+      "detail": "26'"
     },
     {
       "home": "Switzerland",
