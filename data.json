@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-07T01:21:16Z",
+  "updated": "2026-07-07T05:34:26Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-07T01:21:16Z",
+  "server_updated": "2026-07-07T05:34:26Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -20,20 +20,20 @@
   "favorite": "France",
   "favorite_pct": 27,
   "iran_pct_raw": 0,
-  "favorite_pct_model": 18,
+  "favorite_pct_model": 19,
   "favorite_pct_market": 31,
   "contenders": [
     {
       "team": "France",
       "pct": 27,
-      "pct_model": 18,
+      "pct_model": 19,
       "pct_market": 31,
       "record": "5-0-0"
     },
     {
       "team": "Spain",
       "pct": 19,
-      "pct_model": 21,
+      "pct_model": 20,
       "pct_market": 17,
       "record": "4-1-0"
     },
@@ -41,12 +41,12 @@
       "team": "Argentina",
       "pct": 18,
       "pct_model": 19,
-      "pct_market": 16,
+      "pct_market": 17,
       "record": "4-0-0"
     },
     {
       "team": "England",
-      "pct": 14,
+      "pct": 13,
       "pct_model": 13,
       "pct_market": 13,
       "record": "4-1-0"
@@ -59,18 +59,25 @@
       "record": "3-1-1"
     },
     {
-      "team": "Morocco",
-      "pct": 4,
-      "pct_model": 6,
-      "pct_market": 3,
-      "record": "3-2-0"
-    },
-    {
       "team": "Norway",
       "pct": 4,
       "pct_model": 2,
       "pct_market": 5,
       "record": "4-0-1"
+    },
+    {
+      "team": "Belgium",
+      "pct": 4,
+      "pct_model": 6,
+      "pct_market": 2,
+      "record": "3-2-0"
+    },
+    {
+      "team": "Morocco",
+      "pct": 4,
+      "pct_model": 5,
+      "pct_market": 2,
+      "record": "3-2-0"
     },
     {
       "team": "Colombia",
@@ -80,13 +87,6 @@
       "record": "3-1-0"
     },
     {
-      "team": "Belgium",
-      "pct": 3,
-      "pct_model": 3,
-      "pct_market": 2,
-      "record": "2-2-0"
-    },
-    {
       "team": "Switzerland",
       "pct": 2,
       "pct_model": 3,
@@ -94,18 +94,18 @@
       "record": "3-1-0"
     },
     {
-      "team": "United States",
-      "pct": 1,
-      "pct_model": 2,
-      "pct_market": 0,
-      "record": "3-0-1"
-    },
-    {
       "team": "Egypt",
       "pct": 1,
       "pct_model": 1,
       "pct_market": 0,
       "record": "1-3-0"
+    },
+    {
+      "team": "Canada",
+      "pct": 0,
+      "pct_model": 1,
+      "pct_market": 0,
+      "record": "2-1-2"
     }
   ],
   "league": "fifa.world",
@@ -113,36 +113,36 @@
   "team_in_field": true,
   "today": [
     {
-      "home": "Portugal",
-      "away": "Spain",
-      "habbr": "POR",
-      "aabbr": "ESP",
+      "home": "Argentina",
+      "away": "Egypt",
+      "habbr": "ARG",
+      "aabbr": "EGY",
       "hs": 0,
-      "as": 1,
+      "as": 0,
       "ko": true,
-      "fav": null,
-      "fav_pct": null,
-      "opp_pct": null,
+      "fav": "Argentina",
+      "fav_pct": 87,
+      "opp_pct": 13,
       "draw_pct": null,
-      "kickoff": "2026-07-06T19:00Z",
-      "state": "post",
-      "detail": "FT"
+      "kickoff": "2026-07-07T16:00Z",
+      "state": "pre",
+      "detail": "Scheduled"
     },
     {
-      "home": "United States",
-      "away": "Belgium",
-      "habbr": "USA",
-      "aabbr": "BEL",
-      "hs": 1,
-      "as": 2,
+      "home": "Switzerland",
+      "away": "Colombia",
+      "habbr": "SUI",
+      "aabbr": "COL",
+      "hs": 0,
+      "as": 0,
       "ko": true,
-      "fav": "United States",
-      "fav_pct": 52,
-      "opp_pct": 48,
+      "fav": "Colombia",
+      "fav_pct": 60,
+      "opp_pct": 40,
       "draw_pct": null,
-      "kickoff": "2026-07-07T00:00Z",
-      "state": "in",
-      "detail": "57'"
+      "kickoff": "2026-07-07T20:00Z",
+      "state": "pre",
+      "detail": "Scheduled"
     }
   ]
 }
