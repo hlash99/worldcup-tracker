@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-07T08:52:32Z",
+  "updated": "2026-07-07T11:46:32Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-07T08:52:32Z",
+  "server_updated": "2026-07-07T11:46:32Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -21,20 +21,20 @@
   "favorite_pct": 27,
   "iran_pct_raw": 0,
   "favorite_pct_model": 18,
-  "favorite_pct_market": 30,
+  "favorite_pct_market": 32,
   "contenders": [
     {
       "team": "France",
       "pct": 27,
       "pct_model": 18,
-      "pct_market": 30,
+      "pct_market": 32,
       "record": "5-0-0"
     },
     {
       "team": "Spain",
       "pct": 19,
       "pct_model": 20,
-      "pct_market": 18,
+      "pct_market": 17,
       "record": "4-1-0"
     },
     {
@@ -52,13 +52,6 @@
       "record": "4-1-0"
     },
     {
-      "team": "Norway",
-      "pct": 4,
-      "pct_model": 2,
-      "pct_market": 6,
-      "record": "4-0-1"
-    },
-    {
       "team": "Brazil",
       "pct": 4,
       "pct_model": 10,
@@ -66,17 +59,24 @@
       "record": "3-1-1"
     },
     {
-      "team": "Belgium",
+      "team": "Norway",
       "pct": 4,
-      "pct_model": 6,
-      "pct_market": 2,
-      "record": "3-2-0"
+      "pct_model": 2,
+      "pct_market": 5,
+      "record": "4-0-1"
     },
     {
       "team": "Morocco",
       "pct": 4,
       "pct_model": 5,
       "pct_market": 3,
+      "record": "3-2-0"
+    },
+    {
+      "team": "Belgium",
+      "pct": 4,
+      "pct_model": 6,
+      "pct_market": 2,
       "record": "3-2-0"
     },
     {
@@ -103,7 +103,7 @@
     {
       "team": "Canada",
       "pct": 0,
-      "pct_model": 0,
+      "pct_model": 1,
       "pct_market": 0,
       "record": "2-1-2"
     }
