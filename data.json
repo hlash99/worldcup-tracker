@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-08T19:44:43Z",
+  "updated": "2026-07-08T20:47:56Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-08T19:44:43Z",
+  "server_updated": "2026-07-08T20:47:56Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -20,21 +20,21 @@
   "favorite": "France",
   "favorite_pct": 27,
   "iran_pct_raw": 0,
-  "favorite_pct_model": 19,
-  "favorite_pct_market": 30,
+  "favorite_pct_model": 18,
+  "favorite_pct_market": 31,
   "contenders": [
     {
       "team": "France",
       "pct": 27,
-      "pct_model": 19,
-      "pct_market": 30,
+      "pct_model": 18,
+      "pct_market": 31,
       "record": "5-0-0"
     },
     {
       "team": "Argentina",
       "pct": 19,
-      "pct_model": 20,
-      "pct_market": 18,
+      "pct_model": 21,
+      "pct_market": 17,
       "record": "5-0-0"
     },
     {
@@ -88,7 +88,7 @@
     },
     {
       "team": "Colombia",
-      "pct": 0,
+      "pct": 1,
       "pct_model": 1,
       "pct_market": 0,
       "record": "3-2-0"
