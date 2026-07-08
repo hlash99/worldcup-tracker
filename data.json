@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-08T03:40:37Z",
+  "updated": "2026-07-08T06:17:35Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-08T03:40:37Z",
+  "server_updated": "2026-07-08T06:17:35Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -20,13 +20,13 @@
   "favorite": "France",
   "favorite_pct": 27,
   "iran_pct_raw": 0,
-  "favorite_pct_model": 19,
+  "favorite_pct_model": 18,
   "favorite_pct_market": 31,
   "contenders": [
     {
       "team": "France",
       "pct": 27,
-      "pct_model": 19,
+      "pct_model": 18,
       "pct_market": 31,
       "record": "5-0-0"
     },
@@ -53,7 +53,7 @@
     },
     {
       "team": "Norway",
-      "pct": 4,
+      "pct": 5,
       "pct_model": 2,
       "pct_market": 6,
       "record": "4-0-1"
@@ -61,7 +61,7 @@
     {
       "team": "Brazil",
       "pct": 4,
-      "pct_model": 10,
+      "pct_model": 11,
       "pct_market": 0,
       "record": "3-1-1"
     },
@@ -94,18 +94,18 @@
       "record": "3-2-0"
     },
     {
+      "team": "Canada",
+      "pct": 0,
+      "pct_model": 1,
+      "pct_market": 0,
+      "record": "2-1-2"
+    },
+    {
       "team": "Egypt",
       "pct": 0,
       "pct_model": 0,
       "pct_market": 0,
       "record": "1-3-1"
-    },
-    {
-      "team": "Canada",
-      "pct": 0,
-      "pct_model": 0,
-      "pct_market": 0,
-      "record": "2-1-2"
     }
   ],
   "league": "fifa.world",
@@ -113,36 +113,20 @@
   "team_in_field": true,
   "today": [
     {
-      "home": "Argentina",
-      "away": "Egypt",
-      "habbr": "ARG",
-      "aabbr": "EGY",
-      "hs": 3,
-      "as": 2,
-      "ko": true,
-      "fav": null,
-      "fav_pct": null,
-      "opp_pct": null,
-      "draw_pct": null,
-      "kickoff": "2026-07-07T16:00Z",
-      "state": "post",
-      "detail": "FT"
-    },
-    {
-      "home": "Switzerland",
-      "away": "Colombia",
-      "habbr": "SUI",
-      "aabbr": "COL",
+      "home": "France",
+      "away": "Morocco",
+      "habbr": "FRA",
+      "aabbr": "MAR",
       "hs": 0,
       "as": 0,
       "ko": true,
-      "fav": null,
-      "fav_pct": null,
-      "opp_pct": null,
+      "fav": "France",
+      "fav_pct": 79,
+      "opp_pct": 21,
       "draw_pct": null,
-      "kickoff": "2026-07-07T20:00Z",
-      "state": "post",
-      "detail": "FT-Pens"
+      "kickoff": "2026-07-09T20:00Z",
+      "state": "pre",
+      "detail": "Scheduled"
     }
   ]
 }
