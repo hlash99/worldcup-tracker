@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-08T08:47:42Z",
+  "updated": "2026-07-08T10:51:37Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-08T08:47:42Z",
+  "server_updated": "2026-07-08T10:51:37Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -18,14 +18,14 @@
   "next_kickoff": null,
   "next_confirmed": null,
   "favorite": "France",
-  "favorite_pct": 28,
+  "favorite_pct": 27,
   "iran_pct_raw": 0,
   "favorite_pct_model": 19,
   "favorite_pct_market": 31,
   "contenders": [
     {
       "team": "France",
-      "pct": 28,
+      "pct": 27,
       "pct_model": 19,
       "pct_market": 31,
       "record": "5-0-0"
@@ -33,7 +33,7 @@
     {
       "team": "Argentina",
       "pct": 19,
-      "pct_model": 20,
+      "pct_model": 21,
       "pct_market": 17,
       "record": "5-0-0"
     },
@@ -68,14 +68,14 @@
     {
       "team": "Morocco",
       "pct": 4,
-      "pct_model": 6,
+      "pct_model": 5,
       "pct_market": 3,
       "record": "3-2-0"
     },
     {
       "team": "Belgium",
       "pct": 4,
-      "pct_model": 5,
+      "pct_model": 6,
       "pct_market": 2,
       "record": "3-2-0"
     },
@@ -94,18 +94,18 @@
       "record": "3-2-0"
     },
     {
-      "team": "Canada",
-      "pct": 0,
-      "pct_model": 0,
-      "pct_market": 0,
-      "record": "2-1-2"
-    },
-    {
       "team": "Egypt",
       "pct": 0,
       "pct_model": 0,
       "pct_market": 0,
       "record": "1-3-1"
+    },
+    {
+      "team": "Canada",
+      "pct": 0,
+      "pct_model": 0,
+      "pct_market": 0,
+      "record": "2-1-2"
     }
   ],
   "league": "fifa.world",
@@ -121,8 +121,8 @@
       "as": 0,
       "ko": true,
       "fav": "France",
-      "fav_pct": 79,
-      "opp_pct": 21,
+      "fav_pct": 80,
+      "opp_pct": 20,
       "draw_pct": null,
       "kickoff": "2026-07-09T20:00Z",
       "state": "pre",
