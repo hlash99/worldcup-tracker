@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-09T20:17:29Z",
+  "updated": "2026-07-09T21:50:59Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-09T20:17:29Z",
+  "server_updated": "2026-07-09T21:50:59Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -18,30 +18,30 @@
   "next_kickoff": null,
   "next_confirmed": null,
   "favorite": "France",
-  "favorite_pct": 26,
+  "favorite_pct": 31,
   "iran_pct_raw": 0,
   "favorite_pct_model": 18,
-  "favorite_pct_market": 31,
+  "favorite_pct_market": 38,
   "contenders": [
     {
       "team": "France",
-      "pct": 26,
+      "pct": 31,
       "pct_model": 18,
-      "pct_market": 31,
+      "pct_market": 38,
       "record": "5-0-0"
     },
     {
       "team": "Argentina",
       "pct": 19,
       "pct_model": 21,
-      "pct_market": 17,
+      "pct_market": 16,
       "record": "5-0-0"
     },
     {
       "team": "Spain",
-      "pct": 19,
+      "pct": 17,
       "pct_model": 19,
-      "pct_market": 18,
+      "pct_market": 15,
       "record": "4-1-0"
     },
     {
@@ -61,21 +61,14 @@
     {
       "team": "Brazil",
       "pct": 4,
-      "pct_model": 10,
+      "pct_model": 11,
       "pct_market": 0,
       "record": "3-1-1"
     },
     {
-      "team": "Morocco",
-      "pct": 4,
-      "pct_model": 6,
-      "pct_market": 3,
-      "record": "3-2-0"
-    },
-    {
       "team": "Belgium",
       "pct": 4,
-      "pct_model": 5,
+      "pct_model": 6,
       "pct_market": 2,
       "record": "3-2-0"
     },
@@ -87,6 +80,13 @@
       "record": "3-2-0"
     },
     {
+      "team": "Morocco",
+      "pct": 2,
+      "pct_model": 5,
+      "pct_market": 0,
+      "record": "3-2-0"
+    },
+    {
       "team": "Colombia",
       "pct": 0,
       "pct_model": 1,
@@ -94,18 +94,18 @@
       "record": "3-2-0"
     },
     {
-      "team": "Egypt",
-      "pct": 0,
-      "pct_model": 0,
-      "pct_market": 0,
-      "record": "1-3-1"
-    },
-    {
       "team": "Canada",
       "pct": 0,
       "pct_model": 0,
       "pct_market": 0,
       "record": "2-1-2"
+    },
+    {
+      "team": "Egypt",
+      "pct": 0,
+      "pct_model": 0,
+      "pct_market": 0,
+      "record": "1-3-1"
     }
   ],
   "league": "fifa.world",
@@ -117,7 +117,7 @@
       "away": "Morocco",
       "habbr": "FRA",
       "aabbr": "MAR",
-      "hs": 0,
+      "hs": 2,
       "as": 0,
       "ko": true,
       "fav": "France",
@@ -126,7 +126,7 @@
       "draw_pct": null,
       "kickoff": "2026-07-09T20:00Z",
       "state": "in",
-      "detail": "16'"
+      "detail": "86'"
     }
   ]
 }
