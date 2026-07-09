@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-09T21:50:59Z",
+  "updated": "2026-07-09T23:08:51Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-09T21:50:59Z",
+  "server_updated": "2026-07-09T23:08:51Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -18,30 +18,30 @@
   "next_kickoff": null,
   "next_confirmed": null,
   "favorite": "France",
-  "favorite_pct": 31,
+  "favorite_pct": 32,
   "iran_pct_raw": 0,
-  "favorite_pct_model": 18,
-  "favorite_pct_market": 38,
+  "favorite_pct_model": 22,
+  "favorite_pct_market": 37,
   "contenders": [
     {
       "team": "France",
-      "pct": 31,
-      "pct_model": 18,
-      "pct_market": 38,
-      "record": "5-0-0"
+      "pct": 32,
+      "pct_model": 22,
+      "pct_market": 37,
+      "record": "6-0-0"
     },
     {
       "team": "Argentina",
       "pct": 19,
-      "pct_model": 21,
-      "pct_market": 16,
+      "pct_model": 20,
+      "pct_market": 17,
       "record": "5-0-0"
     },
     {
       "team": "Spain",
-      "pct": 17,
-      "pct_model": 19,
-      "pct_market": 15,
+      "pct": 18,
+      "pct_model": 18,
+      "pct_market": 16,
       "record": "4-1-0"
     },
     {
@@ -52,23 +52,23 @@
       "record": "4-1-0"
     },
     {
+      "team": "Brazil",
+      "pct": 4,
+      "pct_model": 10,
+      "pct_market": 0,
+      "record": "3-1-1"
+    },
+    {
       "team": "Norway",
-      "pct": 5,
+      "pct": 4,
       "pct_model": 2,
       "pct_market": 6,
       "record": "4-0-1"
     },
     {
-      "team": "Brazil",
-      "pct": 4,
-      "pct_model": 11,
-      "pct_market": 0,
-      "record": "3-1-1"
-    },
-    {
       "team": "Belgium",
-      "pct": 4,
-      "pct_model": 6,
+      "pct": 3,
+      "pct_model": 5,
       "pct_market": 2,
       "record": "3-2-0"
     },
@@ -81,10 +81,10 @@
     },
     {
       "team": "Morocco",
-      "pct": 2,
-      "pct_model": 5,
+      "pct": 1,
+      "pct_model": 3,
       "pct_market": 0,
-      "record": "3-2-0"
+      "record": "3-2-1"
     },
     {
       "team": "Colombia",
@@ -120,13 +120,13 @@
       "hs": 2,
       "as": 0,
       "ko": true,
-      "fav": "France",
-      "fav_pct": 79,
-      "opp_pct": 21,
+      "fav": null,
+      "fav_pct": null,
+      "opp_pct": null,
       "draw_pct": null,
       "kickoff": "2026-07-09T20:00Z",
-      "state": "in",
-      "detail": "86'"
+      "state": "post",
+      "detail": "FT"
     }
   ]
 }
