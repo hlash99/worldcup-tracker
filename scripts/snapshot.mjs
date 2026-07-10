@@ -12,6 +12,17 @@ import { dirname, join } from "node:path";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const IRAN = process.env.TEAM || "Iran";
+
+// Safari ignores runtime <link rel=icon> swaps (it reads the static tag once and caches it),
+// so the tab icon must be baked into index.html server-side: Iran's flag while Iran are alive,
+// the title favorite's flag once they're out. Mirrors setFavicon()'s logic in index.html.
+const FLAG={"Algeria":"🇩🇿","Argentina":"🇦🇷","Australia":"🇦🇺","Austria":"🇦🇹","Belgium":"🇧🇪","Bosnia-Herzegovina":"🇧🇦","Brazil":"🇧🇷","Canada":"🇨🇦","Cape Verde":"🇨🇻","Colombia":"🇨🇴","Congo DR":"🇨🇩","Croatia":"🇭🇷","Curaçao":"🇨🇼","Czechia":"🇨🇿","Ecuador":"🇪🇨","Egypt":"🇪🇬","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","France":"🇫🇷","Germany":"🇩🇪","Ghana":"🇬🇭","Haiti":"🇭🇹","Iran":"🇮🇷","Iraq":"🇮🇶","Ivory Coast":"🇨🇮","Japan":"🇯🇵","Jordan":"🇯🇴","Mexico":"🇲🇽","Morocco":"🇲🇦","Netherlands":"🇳🇱","New Zealand":"🇳🇿","Norway":"🇳🇴","Panama":"🇵🇦","Paraguay":"🇵🇾","Portugal":"🇵🇹","Qatar":"🇶🇦","Saudi Arabia":"🇸🇦","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Senegal":"🇸🇳","South Africa":"🇿🇦","South Korea":"🇰🇷","Spain":"🇪🇸","Sweden":"🇸🇪","Switzerland":"🇨🇭","Tunisia":"🇹🇳","Türkiye":"🇹🇷","Turkey":"🇹🇷","United States":"🇺🇸","USA":"🇺🇸","Uruguay":"🇺🇾","Uzbekistan":"🇺🇿"};
+function patchFavicon(emoji) {
+  const p = join(ROOT, "index.html");
+  const html = readFileSync(p, "utf8");
+  const next = html.replace(/(<link rel="icon".*?font-size="92">)[^<]*(<\/text><\/svg>'>)/, `$1${emoji}$2`);
+  if (next !== html) { writeFileSync(p, next); console.log(`favicon → ${emoji}`); }
+}
 // Target tournament is auto-resolved each run (men's fifa.world or women's fifa.wwc, whichever WC is
 // live/next) so the same Action keeps working for every future World Cup with no config changes.
 // Force a specific one with LEAGUE=fifa.wwc SEASON=2027 if ever needed.
@@ -408,6 +419,7 @@ async function main() {
     getScoreboardJSON(todayKey()).then(parseToday).catch(() => [])]);
   const fav = blendFavorite(favModel, market);   // WC winner: model blended with market (null until R32 set)
   if (fav && fav.contenders) for (const c of fav.contenders) { const r = recs[norm(c.team)]; c.record = r ? `${r.w}-${r.d}-${r.l}` : null; }   // attach each team's W-D-L
+  patchFavicon((status === "eliminated" || status === "absent") && fav ? (FLAG[fav.favorite] || "🏆") : "🇮🇷");
 
   const prev = JSON.parse(readFileSync(join(ROOT, "data.json"), "utf8"));
   const out = {
