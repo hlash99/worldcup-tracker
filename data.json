@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-11T01:11:30Z",
+  "updated": "2026-07-11T04:31:04Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-11T01:11:30Z",
+  "server_updated": "2026-07-11T04:31:04Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -18,15 +18,15 @@
   "next_kickoff": null,
   "next_confirmed": null,
   "favorite": "France",
-  "favorite_pct": 30,
+  "favorite_pct": 31,
   "iran_pct_raw": 0,
-  "favorite_pct_model": 21,
+  "favorite_pct_model": 20,
   "favorite_pct_market": 35,
   "contenders": [
     {
       "team": "France",
-      "pct": 30,
-      "pct_model": 21,
+      "pct": 31,
+      "pct_model": 20,
       "pct_market": 35,
       "record": "6-0-0"
     },
@@ -34,13 +34,13 @@
       "team": "Spain",
       "pct": 24,
       "pct_model": 29,
-      "pct_market": 20,
+      "pct_market": 19,
       "record": "5-1-0"
     },
     {
       "team": "Argentina",
       "pct": 18,
-      "pct_model": 18,
+      "pct_model": 19,
       "pct_market": 17,
       "record": "5-0-0"
     },
@@ -94,18 +94,18 @@
       "record": "2-1-2"
     },
     {
-      "team": "Egypt",
-      "pct": 0,
-      "pct_model": 0,
-      "pct_market": 0,
-      "record": "1-3-1"
-    },
-    {
       "team": "Paraguay",
       "pct": 0,
       "pct_model": 0,
       "pct_market": 0,
       "record": "1-2-2"
+    },
+    {
+      "team": "Egypt",
+      "pct": 0,
+      "pct_model": 0,
+      "pct_market": 0,
+      "record": "1-3-1"
     }
   ],
   "league": "fifa.world",
@@ -113,20 +113,36 @@
   "team_in_field": true,
   "today": [
     {
-      "home": "Spain",
-      "away": "Belgium",
-      "habbr": "ESP",
-      "aabbr": "BEL",
-      "hs": 2,
-      "as": 1,
+      "home": "Norway",
+      "away": "England",
+      "habbr": "NOR",
+      "aabbr": "ENG",
+      "hs": 0,
+      "as": 0,
       "ko": true,
-      "fav": null,
-      "fav_pct": null,
-      "opp_pct": null,
+      "fav": "England",
+      "fav_pct": 67,
+      "opp_pct": 33,
       "draw_pct": null,
-      "kickoff": "2026-07-10T19:00Z",
-      "state": "post",
-      "detail": "FT"
+      "kickoff": "2026-07-11T21:00Z",
+      "state": "pre",
+      "detail": "Scheduled"
+    },
+    {
+      "home": "Argentina",
+      "away": "Switzerland",
+      "habbr": "ARG",
+      "aabbr": "SUI",
+      "hs": 0,
+      "as": 0,
+      "ko": true,
+      "fav": "Argentina",
+      "fav_pct": 76,
+      "opp_pct": 24,
+      "draw_pct": null,
+      "kickoff": "2026-07-12T01:00Z",
+      "state": "pre",
+      "detail": "Scheduled"
     }
   ]
 }
