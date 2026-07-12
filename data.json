@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-12T00:06:13Z",
+  "updated": "2026-07-12T03:51:09Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-12T00:06:13Z",
+  "server_updated": "2026-07-12T03:51:09Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -32,37 +32,37 @@
     },
     {
       "team": "Spain",
-      "pct": 24,
-      "pct_model": 29,
+      "pct": 23,
+      "pct_model": 28,
       "pct_market": 19,
       "record": "5-1-0"
     },
     {
       "team": "Argentina",
-      "pct": 18,
-      "pct_model": 19,
-      "pct_market": 17,
+      "pct": 19,
+      "pct_model": 18,
+      "pct_market": 19,
       "record": "5-0-0"
     },
     {
       "team": "England",
-      "pct": 17,
-      "pct_model": 12,
+      "pct": 18,
+      "pct_model": 14,
       "pct_market": 19,
-      "record": "4-1-0"
+      "record": "5-1-0"
     },
     {
       "team": "Brazil",
       "pct": 4,
-      "pct_model": 9,
+      "pct_model": 11,
       "pct_market": 0,
       "record": "3-1-1"
     },
     {
       "team": "Switzerland",
-      "pct": 3,
+      "pct": 1,
       "pct_model": 3,
-      "pct_market": 2,
+      "pct_market": 0,
       "record": "3-2-0"
     },
     {
@@ -71,13 +71,6 @@
       "pct_model": 3,
       "pct_market": 0,
       "record": "3-2-1"
-    },
-    {
-      "team": "Norway",
-      "pct": 1,
-      "pct_model": 2,
-      "pct_market": 0,
-      "record": "4-0-1"
     },
     {
       "team": "Colombia",
@@ -94,18 +87,18 @@
       "record": "2-1-2"
     },
     {
-      "team": "Paraguay",
-      "pct": 0,
-      "pct_model": 0,
-      "pct_market": 0,
-      "record": "1-2-2"
-    },
-    {
       "team": "Egypt",
       "pct": 0,
       "pct_model": 0,
       "pct_market": 0,
       "record": "1-3-1"
+    },
+    {
+      "team": "Paraguay",
+      "pct": 0,
+      "pct_model": 0,
+      "pct_market": 0,
+      "record": "1-2-2"
     }
   ],
   "league": "fifa.world",
@@ -133,16 +126,16 @@
       "away": "Switzerland",
       "habbr": "ARG",
       "aabbr": "SUI",
-      "hs": 0,
-      "as": 0,
+      "hs": 3,
+      "as": 1,
       "ko": true,
-      "fav": "Argentina",
-      "fav_pct": 76,
-      "opp_pct": 24,
+      "fav": null,
+      "fav_pct": null,
+      "opp_pct": null,
       "draw_pct": null,
       "kickoff": "2026-07-12T01:00Z",
-      "state": "pre",
-      "detail": "Scheduled"
+      "state": "post",
+      "detail": "AET"
     }
   ]
 }
