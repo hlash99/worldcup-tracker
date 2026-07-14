@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-14T10:21:49Z",
+  "updated": "2026-07-14T11:52:56Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-14T10:21:49Z",
+  "server_updated": "2026-07-14T11:52:56Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -18,15 +18,15 @@
   "next_kickoff": null,
   "next_confirmed": null,
   "favorite": "France",
-  "favorite_pct": 31,
+  "favorite_pct": 32,
   "iran_pct_raw": 0,
-  "favorite_pct_model": 20,
+  "favorite_pct_model": 21,
   "favorite_pct_market": 37,
   "contenders": [
     {
       "team": "France",
-      "pct": 31,
-      "pct_model": 20,
+      "pct": 32,
+      "pct_model": 21,
       "pct_market": 37,
       "record": "6-0-0"
     },
@@ -34,7 +34,7 @@
       "team": "Spain",
       "pct": 24,
       "pct_model": 27,
-      "pct_market": 20,
+      "pct_market": 19,
       "record": "5-1-0"
     },
     {
@@ -47,14 +47,14 @@
     {
       "team": "England",
       "pct": 18,
-      "pct_model": 14,
+      "pct_model": 13,
       "pct_market": 20,
       "record": "5-1-0"
     },
     {
       "team": "Brazil",
-      "pct": 5,
-      "pct_model": 11,
+      "pct": 4,
+      "pct_model": 10,
       "pct_market": 0,
       "record": "3-1-1"
     },
