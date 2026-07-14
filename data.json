@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-14T20:01:20Z",
+  "updated": "2026-07-14T21:11:25Z",
   "team": "Iran",
   "group": "G",
   "status": "3rd in Group G · 3 pts · 0 GD · 3 GF — chasing a best-third spot",
@@ -10,7 +10,7 @@
   "live": true,
   "source": "ESPN public feed (standings + scoreboard); recomputed server-side by scripts/snapshot.mjs",
   "note": "The page computes Iran's advancement probability live from the real group tables via Monte-Carlo of the remaining matches. baseline_pct is a recent snapshot for the dashboard card; the live page recomputes continuously.",
-  "server_updated": "2026-07-14T20:01:20Z",
+  "server_updated": "2026-07-14T21:11:25Z",
   "iran_pct": 0,
   "iran_pos": 9,
   "iran_status": "eliminated",
@@ -18,38 +18,38 @@
   "next_kickoff": null,
   "next_confirmed": null,
   "favorite": "Spain",
-  "favorite_pct": 32,
+  "favorite_pct": 45,
   "iran_pct_raw": 0,
   "favorite_pct_model": 27,
-  "favorite_pct_market": 33,
+  "favorite_pct_market": 53,
   "contenders": [
     {
       "team": "Spain",
-      "pct": 32,
+      "pct": 45,
       "pct_model": 27,
-      "pct_market": 33,
+      "pct_market": 53,
       "record": "5-1-0"
     },
     {
-      "team": "France",
-      "pct": 21,
-      "pct_model": 21,
-      "pct_market": 21,
-      "record": "6-0-0"
-    },
-    {
       "team": "Argentina",
-      "pct": 20,
+      "pct": 21,
       "pct_model": 22,
-      "pct_market": 18,
+      "pct_market": 19,
       "record": "6-0-0"
     },
     {
       "team": "England",
       "pct": 19,
       "pct_model": 14,
-      "pct_market": 22,
+      "pct_market": 21,
       "record": "5-1-0"
+    },
+    {
+      "team": "France",
+      "pct": 9,
+      "pct_model": 21,
+      "pct_market": 0,
+      "record": "6-0-0"
     },
     {
       "team": "Brazil",
@@ -111,15 +111,15 @@
       "habbr": "FRA",
       "aabbr": "ESP",
       "hs": 0,
-      "as": 1,
+      "as": 2,
       "ko": true,
-      "fav": "France",
-      "fav_pct": 54,
-      "opp_pct": 46,
+      "fav": null,
+      "fav_pct": null,
+      "opp_pct": null,
       "draw_pct": null,
       "kickoff": "2026-07-14T19:00Z",
-      "state": "in",
-      "detail": "HT"
+      "state": "post",
+      "detail": "FT"
     }
   ]
 }
